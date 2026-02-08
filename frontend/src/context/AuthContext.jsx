@@ -77,6 +77,12 @@ export function AuthProvider({ children }) {
     window.dispatchEvent(new Event('auth-logout'));
   };
 
+  const updateUser = (updatedData) => {
+    const newUser = { ...user, ...updatedData };
+    setUser(newUser);
+    localStorage.setItem('colorsmith_user', JSON.stringify(newUser));
+  };
+
   const loginAdmin = (token, admin) => {
     localStorage.setItem('colorsmith_admin_token', token);
     localStorage.removeItem('colorsmith_token');
@@ -87,7 +93,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, loginAdmin }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, loginAdmin, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

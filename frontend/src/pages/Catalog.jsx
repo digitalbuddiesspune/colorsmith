@@ -64,30 +64,28 @@ export default function Catalog() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl font-semibold text-slate-900 mb-2">{title}</h1>
+      <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2">{title}</h1>
       <p className="text-slate-600 mb-10">{subtitle}</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {list.map((product) => (
           <Link
             key={product._id}
             to={`/product/${product._id}`}
-            className="block p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-brand-500/50 hover:shadow transition-all"
+            className="block p-4 lg:p-6 rounded-md bg-white border border-slate-200 shadow-sm hover:border-brand-500/50 hover:shadow transition-all"
           >
             {product.image ? (
               <img
                 src={product.image}
                 alt=""
-                className="h-32 w-full object-contain rounded-lg mb-4 bg-white"
+                className="lg:h-40 h-32 w-fit object-contain rounded-xl"
               />
             ) : (
               <div className="h-32 rounded-lg bg-brand-100 flex items-center justify-center mb-4">
                 <span className="text-brand-600 text-lg">◆</span>
               </div>
             )}
-            <h2 className="text-lg font-medium text-slate-900 mb-1">{product.name}</h2>
-            <p className="text-slate-600 text-sm">
-              {product.category?.name || 'Product'}
-            </p>
+            <h2 className="text-sm lg:text-base font-medium text-slate-900 mb-1">{product.name}</h2>
+           
           </Link>
         ))}
       </div>

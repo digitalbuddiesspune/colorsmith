@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, userLogin, getMe, createUser, deleteUser, getUsers, updateUser } from '../../controllers/users/loginController.js';
+import { registerUser, userLogin, getMe, changePassword, createUser, deleteUser, getUsers, updateUser } from '../../controllers/users/loginController.js';
 import { protect } from '../../middleware/auth.js';
 
 const userRouter = express.Router();
@@ -10,6 +10,9 @@ userRouter.post('/auth/login', userLogin);
 
 // Get current user (protected)
 userRouter.get('/auth/me', protect, getMe);
+
+// Change password (protected)
+userRouter.put('/auth/change-password', protect, changePassword);
 
 // Legacy routes
 userRouter.post('/create-user', createUser);

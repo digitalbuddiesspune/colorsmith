@@ -87,6 +87,32 @@ export const getMe = async (req, res) => {
     }
 };
 
+// Change password (protected route)
+export const changePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Current password and new password are required' });
+    }
+    if (newPassword.length < 6) {
+        return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
+    }
+    try {
+        const foundUser = await User.findById(req.user._id);
+        if (!foundUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const isMatch = await foundUser.matchPassword(currentPassword);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+        }
+        foundUser.password = newPassword;
+        await foundUser.save();
+        return res.status(200).json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message || 'Failed to change password' });
+    }
+};
+
 // Legacy: Create user (alias for register)
 export const createUser = registerUser;
 

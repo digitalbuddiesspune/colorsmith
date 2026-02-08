@@ -32,6 +32,9 @@ export const auth = {
   login: (email, password) => client.post('/auth/login', { email, password }),
   register: (data) => client.post('/auth/register', data),
   me: () => client.get('/auth/me'),
+  changePassword: (currentPassword, newPassword) =>
+    client.put('/auth/change-password', { currentPassword, newPassword }),
+  updateProfile: (id, data) => client.put(`/update-user/${id}`, data),
 };
 
 export const categories = {

@@ -421,17 +421,8 @@ export default function Checkout() {
         {/* Order Summary */}
         <aside className="lg:col-span-2">
           <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm sticky top-24">
-            <h2 className="font-medium text-slate-900 mb-4">Order Summary</h2>
-            <div className="space-y-3 text-sm">
-              {cart.map((item) => (
-                <div key={item.lineId} className="flex justify-between gap-2">
-                  <span className="text-slate-600 truncate">{item.productName}</span>
-                  <span className="text-slate-900 shrink-0">
-                    Rs{Number(item.totalPrice).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <h2 className="font-medium text-slate-900 mb-4">Billing Details</h2>
+           
             <div className="border-t border-slate-200 mt-4 pt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-600">Subtotal</span>
@@ -465,13 +456,7 @@ export default function Checkout() {
               </div>
             </div>
 
-            {selectedAddress && (
-              <div className="mt-4 p-3 rounded-lg bg-slate-50 text-xs text-slate-600">
-                <span className="font-medium text-slate-700">Deliver to:</span>
-                {selectedAddress.name && <p className="mt-1 font-medium text-slate-800">{selectedAddress.name}</p>}
-                <p className={selectedAddress.name ? '' : 'mt-1'}>{selectedAddress.address}, {selectedAddress.city}, {selectedAddress.state} {selectedAddress.zip}</p>
-              </div>
-            )}
+           
 
             {/* Payment Method Selection */}
             <div className="mt-4 pt-4 border-t border-slate-200">

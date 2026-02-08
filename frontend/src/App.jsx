@@ -27,6 +27,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import Policies from './pages/Policies';
+import Account from './pages/Account';
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
               <Route path="my-color-sets" element={<MyColorSets />} />
               <Route path="color-set/:id" element={<ColorSetDetail />} />
               <Route path="color-set/:id/edit" element={<ColorSetEdit />} />
+              <Route path="account" element={<Account />} />
               <Route path="policies/:slug" element={<Policies />} />
             </Route>
             

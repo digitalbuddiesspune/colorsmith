@@ -29,26 +29,26 @@ export default function CategoriesList() {
 
   return (
     <div className="py-10">
-      <h1 className="text-3xl font-semibold text-slate-900 mb-2">Categories</h1>
+      <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2">Categories</h1>
       <p className="text-slate-600 mb-10">
         Browse our range of cosmetics finished products and raw materials by category.
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {list.map((category) => (
           <Link
             key={category._id}
             to={`/catalog?category=${category._id}`}
             state={{ categoryName: category.name }}
-            className="items-center gap-4 p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-brand-500/50 hover:shadow transition-all group"
+            className="items-center gap-4 lg:gap-6 shadow-sm rounded-md lg:p-6 p-4 bg-white border border-slate-200  hover:border-brand-500/50 transition-all group"
           >
             <div>
-              <img src={category.image} alt={category.name} className="h-56 w-full object-contain rounded-xl" />
+              <img src={category.image} alt={category.name} className="lg:h-40 h-32 w-fit object-contain rounded-xl" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-slate-900 group-hover:text-brand-600 transition-colors">
+              <h2 className="lg:text-base text-sm font-medium text-slate-900 group-hover:text-brand-600 transition-colors text-center truncate">
                 {category.name}
               </h2>
-              <p className="text-slate-500 text-sm">View products</p>
+              {/* <p className="text-slate-500 text-sm">View products</p> */}
             </div>
           </Link>
         ))}
