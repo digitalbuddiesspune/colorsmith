@@ -152,11 +152,12 @@ export default function Testimonials() {
 
   return (
     <section className="mt-16 pt-16 border-t border-slate-200">
-      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">What our clients say</h2>
-      <p className="text-slate-600 mb-10 max-w-2xl">
+      <div className='text-center'> <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">What our clients say</h2>
+      <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
         Brands and manufacturers trust Color Smith for raw materials and finished products.
       </p>
-
+      </div>
+     
       {/* Desktop: grid layout */}
       <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {reviews.map((review, i) => (

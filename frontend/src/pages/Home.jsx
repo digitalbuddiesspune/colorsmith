@@ -5,6 +5,7 @@ import Testimonials from '../components/Testimonials';
 import CategoriesList from './CategoriesList';
 import HeroSection from '../components/HeroSection';
 import FAQ from '../components/FAQ';
+import ContactUs from '../components/ContactUs';
 
 export default function Home() {
   const location = useLocation();
@@ -40,8 +41,11 @@ export default function Home() {
       <section id="testimonials" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
         <Testimonials />
       </section>
-      <section id="faq" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0 mb-10 ">
+      <section id="faq" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0 mb-10">
         <FAQ />
+      </section>
+      <section id="contact" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0 mb-10">
+        <ContactUs />
       </section>
     </div>
   );

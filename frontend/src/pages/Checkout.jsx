@@ -14,6 +14,52 @@ const emptyForm = {
   phone: '',
 };
 
+const indianStates = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
+];
+
+const validators = {
+  name: (v) => {
+    if (!v.trim()) return 'Full name is required.';
+    if (v.trim().length < 2) return 'Name must be at least 2 characters.';
+    if (!/^[a-zA-Z\s.'-]+$/.test(v.trim())) return 'Name can only contain letters, spaces, dots, hyphens, and apostrophes.';
+    return '';
+  },
+  address: (v) => {
+    if (!v.trim()) return 'Street address is required.';
+    if (v.trim().length < 10) return 'Please enter a complete street address (at least 10 characters).';
+    return '';
+  },
+  city: (v) => {
+    if (!v.trim()) return 'City is required.';
+    if (!/^[a-zA-Z\s'-]+$/.test(v.trim())) return 'City can only contain letters, spaces, and hyphens.';
+    if (v.trim().length < 2) return 'City name must be at least 2 characters.';
+    return '';
+  },
+  state: (v) => {
+    if (!v) return 'Please select a state.';
+    return '';
+  },
+  zip: (v) => {
+    if (!v.trim()) return 'PIN code is required.';
+    if (!/^\d{6}$/.test(v.trim())) return 'PIN code must be exactly 6 digits.';
+    return '';
+  },
+  phone: (v) => {
+    if (!v.trim()) return 'Phone number is required.';
+    const digits = v.replace(/\D/g, '');
+    if (digits.length === 12 && digits.startsWith('91')) return ''; // +91XXXXXXXXXX
+    if (digits.length === 10 && /^[6-9]/.test(digits)) return '';
+    return 'Enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9).';
+  },
+};
+
 // Load Razorpay script
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -39,6 +85,8 @@ export default function Checkout() {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('COD');
@@ -67,21 +115,72 @@ export default function Checkout() {
       .finally(() => setLoadingAddresses(false));
   }, [user]);
 
+  // Validate a single field
+  const validateField = (field, value) => {
+    const fn = validators[field];
+    return fn ? fn(value) : '';
+  };
+
+  // Validate all fields at once
+  const validateAll = () => {
+    const errors = {};
+    for (const field of Object.keys(validators)) {
+      const msg = validateField(field, form[field]);
+      if (msg) errors[field] = msg;
+    }
+    return errors;
+  };
+
+  // Handle blur — mark touched and show error
+  const handleBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    setFieldErrors((prev) => ({ ...prev, [field]: validateField(field, form[field]) }));
+  };
+
+  // Handle field change with live validation for touched fields
+  const handleFieldChange = (field, value) => {
+    setForm((f) => ({ ...f, [field]: value }));
+    if (touched[field]) {
+      setFieldErrors((prev) => ({ ...prev, [field]: validateField(field, value) }));
+    }
+  };
+
   const handleAddAddress = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.address || !form.city || !form.state || !form.zip || !form.phone) {
-      setError('Please fill all required fields.');
+
+    // Mark all fields as touched
+    const allTouched = {};
+    for (const field of Object.keys(validators)) allTouched[field] = true;
+    setTouched(allTouched);
+
+    // Run all validators
+    const errors = validateAll();
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      setError('Please fix the errors below.');
       return;
     }
+
     setError('');
     setSaving(true);
     try {
-      const res = await addressApi.create(form);
+      const payload = {
+        ...form,
+        name: form.name.trim(),
+        address: form.address.trim(),
+        city: form.city.trim(),
+        zip: form.zip.trim(),
+        phone: form.phone.replace(/\D/g, '').replace(/^91/, '').slice(-10),
+      };
+      const res = await addressApi.create(payload);
       const newAddr = res.data?.address ?? res.data?.data ?? res.data;
       setAddresses((prev) => [...prev, newAddr]);
       setSelectedAddressId(newAddr._id);
       setShowAddForm(false);
       setForm(emptyForm);
+      setFieldErrors({});
+      setTouched({});
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save address');
     } finally {
@@ -320,80 +419,158 @@ export default function Checkout() {
           {showAddForm && (
             <form onSubmit={handleAddAddress} className="p-4 rounded-xl bg-white border border-slate-200 space-y-4">
               <h3 className="font-medium text-slate-900">Add Address</h3>
+
+              {/* Full Name */}
               <div>
                 <label className="block text-sm text-slate-700 mb-1">Full Name *</label>
                 <input
                   type="text"
                   value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
+                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
+                  className={`w-full px-3 py-2 rounded-lg border text-slate-900 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                    touched.name && fieldErrors.name
+                      ? 'border-red-400 focus:ring-red-500/30 focus:border-red-500'
+                      : 'border-slate-300 focus:ring-amber-500/40 focus:border-amber-500'
+                  }`}
                   placeholder="Recipient full name"
                 />
+                {touched.name && fieldErrors.name && (
+                  <p className="text-xs text-red-600 mt-1">{fieldErrors.name}</p>
+                )}
               </div>
+
+              {/* Street Address */}
               <div>
                 <label className="block text-sm text-slate-700 mb-1">Street Address *</label>
                 <input
                   type="text"
                   value={form.address}
-                  onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
+                  onChange={(e) => handleFieldChange('address', e.target.value)}
+                  onBlur={() => handleBlur('address')}
+                  className={`w-full px-3 py-2 rounded-lg border text-slate-900 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                    touched.address && fieldErrors.address
+                      ? 'border-red-400 focus:ring-red-500/30 focus:border-red-500'
+                      : 'border-slate-300 focus:ring-amber-500/40 focus:border-amber-500'
+                  }`}
                   placeholder="House no., Street, Area"
                 />
+                {touched.address && fieldErrors.address && (
+                  <p className="text-xs text-red-600 mt-1">{fieldErrors.address}</p>
+                )}
               </div>
+
+              {/* City + State */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-slate-700 mb-1">City *</label>
                   <input
                     type="text"
                     value={form.city}
-                    onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
+                    onChange={(e) => handleFieldChange('city', e.target.value)}
+                    onBlur={() => handleBlur('city')}
+                    className={`w-full px-3 py-2 rounded-lg border text-slate-900 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                      touched.city && fieldErrors.city
+                        ? 'border-red-400 focus:ring-red-500/30 focus:border-red-500'
+                        : 'border-slate-300 focus:ring-amber-500/40 focus:border-amber-500'
+                    }`}
                     placeholder="City"
                   />
+                  {touched.city && fieldErrors.city && (
+                    <p className="text-xs text-red-600 mt-1">{fieldErrors.city}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm text-slate-700 mb-1">State *</label>
-                  <input
-                    type="text"
+                  <select
                     value={form.state}
-                    onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
-                    placeholder="State"
-                  />
+                    onChange={(e) => handleFieldChange('state', e.target.value)}
+                    onBlur={() => handleBlur('state')}
+                    className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-colors ${
+                      !form.state ? 'text-slate-400' : 'text-slate-900'
+                    } ${
+                      touched.state && fieldErrors.state
+                        ? 'border-red-400 focus:ring-red-500/30 focus:border-red-500'
+                        : 'border-slate-300 focus:ring-amber-500/40 focus:border-amber-500'
+                    }`}
+                  >
+                    <option value="">Select state</option>
+                    {indianStates.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                  {touched.state && fieldErrors.state && (
+                    <p className="text-xs text-red-600 mt-1">{fieldErrors.state}</p>
+                  )}
                 </div>
               </div>
+
+              {/* PIN Code + Country */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-slate-700 mb-1">PIN Code *</label>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    maxLength={6}
                     value={form.zip}
-                    onChange={(e) => setForm((f) => ({ ...f, zip: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                      handleFieldChange('zip', val);
+                    }}
+                    onBlur={() => handleBlur('zip')}
+                    className={`w-full px-3 py-2 rounded-lg border text-slate-900 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                      touched.zip && fieldErrors.zip
+                        ? 'border-red-400 focus:ring-red-500/30 focus:border-red-500'
+                        : 'border-slate-300 focus:ring-amber-500/40 focus:border-amber-500'
+                    }`}
                     placeholder="6-digit PIN"
                   />
+                  {touched.zip && fieldErrors.zip && (
+                    <p className="text-xs text-red-600 mt-1">{fieldErrors.zip}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm text-slate-700 mb-1">Country</label>
                   <input
                     type="text"
                     value={form.country}
-                    onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
-                    placeholder="Country"
+                    disabled
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 text-sm cursor-not-allowed"
                   />
                 </div>
               </div>
+
+              {/* Phone */}
               <div>
                 <label className="block text-sm text-slate-700 mb-1">Phone *</label>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm"
-                  placeholder="10-digit mobile number"
-                />
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-slate-300 bg-slate-50 text-slate-500 text-sm">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={form.phone}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      handleFieldChange('phone', val);
+                    }}
+                    onBlur={() => handleBlur('phone')}
+                    className={`w-full px-3 py-2 rounded-r-lg border text-slate-900 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                      touched.phone && fieldErrors.phone
+                        ? 'border-red-400 focus:ring-red-500/30 focus:border-red-500'
+                        : 'border-slate-300 focus:ring-amber-500/40 focus:border-amber-500'
+                    }`}
+                    placeholder="10-digit mobile number"
+                  />
+                </div>
+                {touched.phone && fieldErrors.phone && (
+                  <p className="text-xs text-red-600 mt-1">{fieldErrors.phone}</p>
+                )}
               </div>
+
               <div className="flex gap-2 pt-2">
                 <button
                   type="submit"
@@ -407,6 +584,8 @@ export default function Checkout() {
                   onClick={() => {
                     setShowAddForm(false);
                     setForm(emptyForm);
+                    setFieldErrors({});
+                    setTouched({});
                     setError('');
                   }}
                   className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300"

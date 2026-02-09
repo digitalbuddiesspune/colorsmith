@@ -99,6 +99,13 @@ export default function Navbar() {
               Catalog
             </NavLink>
 
+            <button
+              type="button"
+              onClick={() => scrollToSection('contact')}
+              className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            >
+              Contact Us
+            </button>
 
           </nav>
 

@@ -96,13 +96,14 @@ export default function FAQ() {
 
   return (
     <section className="mt-16 pt-16 border-t border-slate-200">
-      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-        Frequently Asked Questions
-      </h2>
-      <p className="text-slate-600 mb-10 max-w-2xl">
+      <div className='text-center'>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Frequently Asked Questions</h2>
+        <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
         Everything you need to know about our products, ordering, and services.
       </p>
-      <div className="grid grid-cols-1  gap-4 max-w-5xl ">
+      </div>
+     
+      <div className="grid grid-cols-1  gap-4 max-w-5xl mx-auto">
         {faqs.map((faq, i) => (
           <FAQItem
             key={i}

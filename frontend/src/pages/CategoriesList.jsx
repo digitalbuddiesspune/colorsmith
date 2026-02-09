@@ -29,10 +29,13 @@ export default function CategoriesList() {
 
   return (
     <div className="py-10">
+      <div className='text-center'>
       <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2">Categories</h1>
-      <p className="text-slate-600 mb-10">
+      <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
         Browse our range of cosmetics finished products and raw materials by category.
       </p>
+      </div>
+    
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {list.map((category) => (
           <Link
