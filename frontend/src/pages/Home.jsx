@@ -25,7 +25,21 @@ export default function Home() {
   }, [location]);
 
   return (
-    <div className="">
+    <div className="relative overflow-hidden">
+      {/* Pinkish decorative background blobs */}
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        {/* Top-right pink glow */}
+        <div className="absolute -top-32 right-0 w-[500px] h-[500px] rounded-full bg-pink-200/40 blur-[120px]" />
+        {/* Left mid-page rose glow */}
+        <div className="absolute top-[800px] -left-40 w-[400px] h-[400px] rounded-full bg-rose-200/30 blur-[100px]" />
+        {/* Center fuchsia accent */}
+        <div className="absolute top-[1600px] right-1/4 w-[350px] h-[350px] rounded-full bg-fuchsia-200/25 blur-[110px]" />
+        {/* Bottom-left pink glow */}
+        <div className="absolute top-[2800px] -left-20 w-[450px] h-[450px] rounded-full bg-pink-200/30 blur-[120px]" />
+        {/* Bottom-right rose glow */}
+        <div className="absolute top-[3600px] right-0 w-[400px] h-[400px] rounded-full bg-rose-100/40 blur-[100px]" />
+      </div>
+
       <section id="hero">
         <HeroSection />
       </section>
@@ -34,7 +48,7 @@ export default function Home() {
         <CategoriesList />
       </section>
       
-      <section id="why-color-smith" className="max-w-7xl mx-auto mt-16 pt-16 border-t border-slate-200 scroll-mt-20 px-4 lg:px-0">
+      <section id="why-color-smith" className="max-w-7xl mx-auto mt-16 pt-16 border-t border-slate-200/60 scroll-mt-20 px-4 lg:px-0">
         <WhyColorSmith />
       </section>
       

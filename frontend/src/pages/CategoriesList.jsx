@@ -42,13 +42,13 @@ export default function CategoriesList() {
             key={category._id}
             to={`/catalog?category=${category._id}`}
             state={{ categoryName: category.name }}
-            className="items-center gap-4 lg:gap-6 shadow-sm rounded-md lg:p-6 p-4 bg-white border border-slate-200  hover:border-brand-500/50 transition-all group"
+            className="border rounded-xl border-slate-200  hover:border-brand-500/50 transition-all group"
           >
             <div>
-              <img src={category.image} alt={category.name} className="lg:h-40 h-32 w-fit object-contain rounded-xl" />
+              <img src={category.image} alt={category.name} className="w-full h-full object-contain rounded-xl" />
             </div>
             <div>
-              <h2 className="lg:text-base text-sm font-medium text-slate-900 group-hover:text-brand-600 transition-colors text-center truncate">
+              <h2 className="lg:text-base uppercase text-left pl-5 -mt-6 text-sm font-medium text-slate-900  transition-colors text-center truncate">
                 {category.name}
               </h2>
               {/* <p className="text-slate-500 text-sm">View products</p> */}
