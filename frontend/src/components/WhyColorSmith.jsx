@@ -71,7 +71,7 @@ export default function WhyColorSmith() {
     <section id="why-color-smith" className="scroll-mt-20">
       <div className='text-center'>
       <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Why Color Smith</h2>
-      <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
+      <p className="text-slate-600 mb-10 w-full max-w-5xl mx-auto">
         We support brands and manufacturers with a full range of cosmetics raw materials and finished products, from multiple grades to custom color sets.
       </p>
       </div>

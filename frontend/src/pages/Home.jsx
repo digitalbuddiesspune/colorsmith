@@ -37,7 +37,7 @@ export default function Home() {
         {/* Bottom-left pink glow */}
         <div className="absolute top-[2800px] -left-20 w-[450px] h-[450px] rounded-full bg-pink-200/30 blur-[120px]" />
         {/* Bottom-right rose glow */}
-        <div className="absolute top-[3600px] right-0 w-[400px] h-[400px] rounded-full bg-rose-100/40 blur-[100px]" />
+        <div className="absolute top-[3600px] right-0 w-[400px] h-[400px] rounded-full bg-rose-100 blur-[100px]" />
       </div>
 
       <section id="hero">

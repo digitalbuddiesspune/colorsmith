@@ -71,13 +71,13 @@ export default function Catalog() {
           <Link
             key={product._id}
             to={`/product/${product._id}`}
-            className="block p-4 lg:p-6 rounded-md bg-white border border-slate-200 shadow-sm hover:border-brand-500/50 hover:shadow transition-all"
+            className=""
           >
             {product.image ? (
               <img
                 src={product.image}
                 alt=""
-                className="lg:h-40 h-32 w-fit object-contain rounded-xl"
+                className=""
               />
             ) : (
               <div className="h-32 rounded-lg bg-brand-100 flex items-center justify-center mb-4">

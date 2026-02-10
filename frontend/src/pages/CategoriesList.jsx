@@ -31,7 +31,7 @@ export default function CategoriesList() {
     <div className="py-10">
       <div className='text-center'>
       <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2">Categories</h1>
-      <p className="text-slate-600 mb-5 w-full max-w-2xl mx-auto">
+      <p className="text-slate-600 mb-5 w-full max-w-5xl mx-auto">
         Browse our range of cosmetics finished products and raw materials by category.
       </p>
       </div>
