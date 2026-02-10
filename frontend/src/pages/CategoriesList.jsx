@@ -31,24 +31,24 @@ export default function CategoriesList() {
     <div className="py-10">
       <div className='text-center'>
       <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2">Categories</h1>
-      <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
+      <p className="text-slate-600 mb-5 w-full max-w-2xl mx-auto">
         Browse our range of cosmetics finished products and raw materials by category.
       </p>
       </div>
     
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-2">
         {list.map((category) => (
           <Link
             key={category._id}
             to={`/catalog?category=${category._id}`}
             state={{ categoryName: category.name }}
-            className="border rounded-xl border-slate-200  hover:border-brand-500/50 transition-all group"
+            className=""
           >
             <div>
-              <img src={category.image} alt={category.name} className="w-full h-full object-contain rounded-xl" />
+              <img src={category.image} alt={category.name} className="w-full h-full object-contain " />
             </div>
             <div>
-              <h2 className="lg:text-base uppercase text-left pl-5 -mt-6 text-sm font-medium text-slate-900  transition-colors text-center truncate">
+              <h2 className="lg:text-xl uppercase text-center col-span-2 text-sm font-medium text-slate-900  transition-colors text-center truncate">
                 {category.name}
               </h2>
               {/* <p className="text-slate-500 text-sm">View products</p> */}
