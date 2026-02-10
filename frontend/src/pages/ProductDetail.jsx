@@ -3,13 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { products } from '../api/client';
 import { useCart } from '../context/CartContext';
 
-const statusLabels = { available: 'Available', out_of_stock: 'Out of stock', discontinued: 'Discontinued' };
-const statusClass = {
-  available: 'bg-emerald-100 text-emerald-800',
-  out_of_stock: 'bg-amber-100 text-amber-800',
-  discontinued: 'bg-slate-200 text-slate-600',
-};
-
 function getGradeId(g) {
   return typeof g === 'object' && g != null ? g._id : g;
 }
@@ -24,13 +17,11 @@ export default function ProductDetail() {
   const [error, setError] = useState('');
   const [selectedGradeId, setSelectedGradeId] = useState(null);
   const [selectedColorIds, setSelectedColorIds] = useState([]);
-  // Per-color quantity map: { colorId: quantity }
   const [colorQuantities, setColorQuantities] = useState({});
   const [addedToCart, setAddedToCart] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const { addItem } = useCart();
 
-  // Fetch product data
   useEffect(() => {
     products
       .get(id)
@@ -39,7 +30,6 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Reset selection when navigating to a different product
   useEffect(() => {
     setSelectedGradeId(null);
     setSelectedColorIds([]);
@@ -47,19 +37,21 @@ export default function ProductDetail() {
     setAddedToCart(false);
   }, [id]);
 
+  /* ---------- loading / error ---------- */
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-12 flex justify-center text-slate-600">
-        Loading…
+      <div className="max-w-6xl mx-auto px-4 py-20 flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin" />
+        <span className="text-neutral-500 text-sm">Loading product…</span>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-12 text-center text-red-600">
-        {error || 'Product not found'}
-        <Link to="/catalog" className="block mt-4 text-brand-600 hover:underline">Back to catalog</Link>
+      <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+        <p className="text-red-600 mb-4">{error || 'Product not found'}</p>
+        <Link to="/catalog" className="text-sm font-medium text-neutral-900 hover:underline">← Back to catalog</Link>
       </div>
     );
   }
@@ -67,66 +59,37 @@ export default function ProductDetail() {
   const product = data?.product ?? data;
   const gradesRaw = Array.isArray(product?.grades) ? product.grades : [];
   const colorsRaw = Array.isArray(product?.colors) ? product.colors : [];
-
-  // Normalize to objects with _id, name, price/hexCode so selection works
   const grades = gradesRaw.map((g) => (typeof g === 'object' && g != null ? g : { _id: g, name: '—', price: null }));
   const colors = colorsRaw.map((c) => (typeof c === 'object' && c != null ? c : { _id: c, name: '—', hexCode: '#888' }));
-
   const minimumOrderQuantity = product?.minimumOrderQuantity ?? 1;
 
+  /* ---------- color helpers ---------- */
   const toggleColor = (colorId) => {
     setAddedToCart(false);
     setSelectedColorIds((prev) => {
       if (prev.includes(colorId)) {
-        // Remove color and its quantity
-        setColorQuantities((q) => {
-          const next = { ...q };
-          delete next[colorId];
-          return next;
-        });
+        setColorQuantities((q) => { const next = { ...q }; delete next[colorId]; return next; });
         return prev.filter((cid) => cid !== colorId);
-      } else {
-        // Add color with minimum quantity
-        setColorQuantities((q) => ({ ...q, [colorId]: minimumOrderQuantity }));
-        return [...prev, colorId];
       }
+      setColorQuantities((q) => ({ ...q, [colorId]: minimumOrderQuantity }));
+      return [...prev, colorId];
     });
   };
-
   const getColorQty = (colorId) => colorQuantities[colorId] ?? minimumOrderQuantity;
-
   const updateColorQty = (colorId, value) => {
-    const parsed = parseInt(value, 10);
-    if (!isNaN(parsed) && parsed >= minimumOrderQuantity) {
-      setColorQuantities((q) => ({ ...q, [colorId]: parsed }));
-      setAddedToCart(false);
-    }
+    const p = parseInt(value, 10);
+    if (!isNaN(p) && p >= minimumOrderQuantity) { setColorQuantities((q) => ({ ...q, [colorId]: p })); setAddedToCart(false); }
   };
-
-  const incrementColorQty = (colorId) => {
-    setColorQuantities((q) => ({ ...q, [colorId]: (q[colorId] ?? minimumOrderQuantity) + 1 }));
-    setAddedToCart(false);
-  };
-
+  const incrementColorQty = (colorId) => { setColorQuantities((q) => ({ ...q, [colorId]: (q[colorId] ?? minimumOrderQuantity) + 1 })); setAddedToCart(false); };
   const decrementColorQty = (colorId) => {
-    const current = colorQuantities[colorId] ?? minimumOrderQuantity;
-    if (current > minimumOrderQuantity) {
-      setColorQuantities((q) => ({ ...q, [colorId]: current - 1 }));
-      setAddedToCart(false);
-    }
+    const cur = colorQuantities[colorId] ?? minimumOrderQuantity;
+    if (cur > minimumOrderQuantity) { setColorQuantities((q) => ({ ...q, [colorId]: cur - 1 })); setAddedToCart(false); }
   };
 
   const selectedGrade = grades.find((g) => getGradeId(g) === selectedGradeId);
   const selectedColors = colors.filter((c) => selectedColorIds.includes(getColorId(c)));
-
-  // Calculate totals from per-color quantities
   const totalQuantity = selectedColors.reduce((sum, c) => sum + getColorQty(getColorId(c)), 0);
-  const basePrice =
-    selectedGrade?.price != null && totalQuantity > 0
-      ? Number(selectedGrade.price) * totalQuantity
-      : null;
-
-  // GST calculation
+  const basePrice = selectedGrade?.price != null && totalQuantity > 0 ? Number(selectedGrade.price) * totalQuantity : null;
   const SGST_RATE = 0.09;
   const CGST_RATE = 0.09;
   const sgstAmount = basePrice != null ? basePrice * SGST_RATE : null;
@@ -135,7 +98,6 @@ export default function ProductDetail() {
   const totalPrice = basePrice != null && gstAmount != null ? basePrice + gstAmount : null;
   const canAddToCart = selectedGrade && selectedColors.length > 0 && totalPrice != null;
 
-  // Add each color as a separate cart line item
   const handleAddToCart = async () => {
     if (!canAddToCart || addingToCart) return;
     setAddingToCart(true);
@@ -143,7 +105,6 @@ export default function ProductDetail() {
       for (const color of selectedColors) {
         const cid = getColorId(color);
         const qty = getColorQty(cid);
-        const colorPrice = Number(selectedGrade.price) * qty;
         await addItem({
           productId: product._id,
           productName: product?.name ?? '',
@@ -152,222 +113,236 @@ export default function ProductDetail() {
           colors: [{ id: cid, name: color?.name ?? '', hexCode: color?.hexCode ?? '#888' }],
           quantity: qty,
           unitPrice: selectedGrade?.price ?? 0,
-          totalPrice: colorPrice,
+          totalPrice: Number(selectedGrade.price) * qty,
         });
       }
       setAddedToCart(true);
-    } catch (err) {
-      setError('Failed to add to cart. Please try again.');
+    } catch {
+      setError('Failed to add to cart.');
     } finally {
       setAddingToCart(false);
     }
   };
 
+  const fmt = (n) => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  /* ======================================== JSX ======================================== */
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Link to="/catalog" className="text-slate-600 hover:text-slate-900 text-sm mb-6 inline-block">
-        ← Back to catalog
+    <div className="max-w-7xl mx-auto px-4 lg:px-0 py-8 sm:py-12">
+      {/* breadcrumb */}
+      <Link to="/catalog" className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors mb-8 group">
+        <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+        Back to catalog
       </Link>
-      <div className="mb-10">
-        <h1 className="text-3xl font-semibold text-slate-900 mb-1">{product?.name ?? 'Product'}</h1>
-        <p className="text-slate-600">{product?.category?.name ?? ''}</p>
-        <p className="text-slate-600 mt-1">
-          Minimum order quantity per color: <span className="font-medium text-slate-800">{minimumOrderQuantity}</span> kg
-        </p>
-        {product?.description && (
-          <p className="text-slate-600 mt-2">{product.description}</p>
-        )}
+
+      {/* ---- hero row ---- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 mb-12">
+        {/* product image */}
+        <div className="rounded-2xl border border-neutral-200 flex items-center justify-center  aspect-square lg:aspect-auto lg:min-h-[420px]">
+          {product.image ? (
+            <img src={product.image} alt={product.name} className="max-h-[380px] w-auto object-contain" />
+          ) : (
+            <div className="text-neutral-300">
+              <svg className="w-24 h-24" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+            </div>
+          )}
+        </div>
+
+        {/* product info */}
+        <div className="flex flex-col justify-center">
+          {product?.category?.name && (
+            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">{product.category.name}</span>
+          )}
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">{product?.name ?? 'Product'}</h1>
+          {product?.description && (
+            <p className="text-neutral-500 leading-relaxed mb-6">{product.description}</p>
+          )}
+
+          <div className="flex flex-wrap gap-3 mb-6">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-xs font-medium text-neutral-600">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
+              {grades.length} grade{grades.length !== 1 && 's'}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-xs font-medium text-neutral-600">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 11.25l1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 10-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94-.19-1.28-.53a1.81 1.81 0 010-2.56l8.47-8.47M15 11.25L12 8.25" /></svg>
+              {colors.length} color{colors.length !== 1 && 's'}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-xs font-medium text-neutral-600">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" /></svg>
+              MOQ {minimumOrderQuantity} kg / color
+            </span>
+          </div>
+
+          {/* quick price preview */}
+          {selectedGrade?.price != null && (
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-neutral-900">₹{Number(selectedGrade.price)}</span>
+              <span className="text-sm text-neutral-400">per kg · excl. GST</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      {/* ---- configure section ---- */}
+      <div className="grid gap-10 lg:grid-cols-2">
+        {/* grades */}
         <section>
-          <h2 className="text-lg font-medium text-slate-900 mb-2">Choose grade (one)</h2>
-          <p className="text-slate-600 text-sm mb-4">Select a single grade for this product.</p>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-7 h-7 rounded-full bg-neutral-900 text-white text-xs font-bold flex items-center justify-center">1</span>
+            <h2 className="text-lg font-semibold text-neutral-900">Select grade</h2>
+          </div>
           {grades.length ? (
-            <ul className="space-y-2">
+            <div className="space-y-2">
               {grades.map((g) => {
                 const gid = getGradeId(g);
-                const isSelected = selectedGradeId === gid;
-                return (
-                  <li key={gid}>
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedGradeId(gid); setAddedToCart(false); }}
-                      className={`w-full px-4 py-3 rounded-lg border text-left flex justify-between items-center transition-colors ${
-                        isSelected
-                          ? 'border-amber-500 bg-amber-50 text-slate-900 ring-2 ring-amber-500/30'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span className="text-slate-700 text-xs lg:text-sm">{g?.name ?? '—'}</span>
-                      {g?.price != null && (
-                        <span className="text-slate-600 text-xs lg:text-sm">Rs{Number(g.price)} / KG <span className="text-slate-400">(excl. GST)</span></span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className="text-slate-600">No grades defined for this product.</p>
-          )}
-        </section>
-
-        <section>
-          <h2 className="text-lg font-medium text-slate-900 mb-2">Choose colors (multiple)</h2>
-          <p className="text-slate-600 text-sm mb-4">Select one or more colors. You can set quantity for each color individually.</p>
-          {colors.length ? (
-            <div className="flex flex-wrap gap-3">
-              {colors.map((c) => {
-                const cid = getColorId(c);
-                const isSelected = selectedColorIds.includes(cid);
+                const sel = selectedGradeId === gid;
                 return (
                   <button
-                    key={cid}
+                    key={gid}
                     type="button"
-                    onClick={() => toggleColor(cid)}
-                    title={c?.hexCode}
-                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
-                      isSelected
-                        ? 'border-amber-500 bg-amber-50 ring-2 ring-amber-500/30'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                    onClick={() => { setSelectedGradeId(gid); setAddedToCart(false); }}
+                    className={`w-full px-5 py-4 rounded-xl border text-left flex justify-between items-center gap-4 transition-all ${
+                      sel
+                        ? 'border-neutral-900 bg-neutral-900 text-white shadow-lg shadow-neutral-900/10'
+                        : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400 hover:shadow-sm'
                     }`}
                   >
-                    <div
-                      className="w-6 h-6 rounded-full border border-slate-300 shrink-0"
-                      style={{ backgroundColor: c?.hexCode || '#888' }}
-                    />
-                    <span className="text-slate-700 text-sm">{c?.name ?? '—'}</span>
+                    <span className="font-medium text-sm">{g?.name ?? '—'}</span>
+                    {g?.price != null && (
+                      <span className={`text-sm whitespace-nowrap ${sel ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                        ₹{Number(g.price)} / kg
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
           ) : (
-            <p className="text-slate-600">No colors defined for this product.</p>
+            <p className="text-neutral-400 text-sm">No grades available.</p>
+          )}
+        </section>
+
+        {/* colors */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-7 h-7 rounded-full bg-neutral-900 text-white text-xs font-bold flex items-center justify-center">2</span>
+            <h2 className="text-lg font-semibold text-neutral-900">Select colors</h2>
+          </div>
+          {colors.length ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {colors.map((c) => {
+                const cid = getColorId(c);
+                const sel = selectedColorIds.includes(cid);
+                return (
+                  <button
+                    key={cid}
+                    type="button"
+                    onClick={() => toggleColor(cid)}
+                    className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border transition-all ${
+                      sel
+                        ? 'border-neutral-900 bg-neutral-50 ring-2 ring-neutral-900/20'
+                        : 'border-neutral-200 bg-white hover:border-neutral-400 hover:shadow-sm'
+                    }`}
+                  >
+                    <span
+                      className={`w-7 h-7 rounded-full shrink-0 border-2 transition-all ${sel ? 'border-neutral-900 scale-110' : 'border-neutral-200'}`}
+                      style={{ backgroundColor: c?.hexCode || '#888' }}
+                    />
+                    <span className="text-sm text-neutral-700 truncate">{c?.name ?? '—'}</span>
+                    {sel && (
+                      <svg className="w-4 h-4 text-neutral-900 ml-auto shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-neutral-400 text-sm">No colors available.</p>
           )}
         </section>
       </div>
 
-      {/* Selection Summary with Per-Color Quantity Controls */}
+      {/* ---- summary ---- */}
       {selectedGrade && selectedColors.length > 0 && (
-        <section className="mt-8 p-4 rounded-xl bg-slate-50 border border-slate-200">
-          <h3 className="text-sm font-medium text-slate-700 mb-3">Your selection</h3>
-
-          <div className="mb-3">
-            <span className="text-slate-600 text-sm">Grade: </span>
-            <span className="font-medium text-slate-800">{selectedGrade.name}</span>
-            {selectedGrade.price != null && (
-              <span className="text-slate-600 text-sm ml-1">(Rs{Number(selectedGrade.price).toFixed(2)} / kg)</span>
-            )}
+        <section className="mt-10 rounded-2xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
+          <div className="px-5 sm:px-6 py-4 bg-neutral-900 text-white flex items-center justify-between">
+            <h3 className="font-semibold">Order summary</h3>
+            <span className="text-sm text-neutral-400">{selectedColors.length} color{selectedColors.length !== 1 && 's'} · {selectedGrade.name}</span>
           </div>
 
-          {/* Per-color quantity table */}
-          <div className="space-y-2">
+          <div className="divide-y divide-neutral-100">
             {selectedColors.map((c) => {
               const cid = getColorId(c);
               const qty = getColorQty(cid);
-              const colorSubtotal = selectedGrade?.price != null ? Number(selectedGrade.price) * qty : 0;
+              const sub = selectedGrade?.price != null ? Number(selectedGrade.price) * qty : 0;
               return (
-                <div
-                  key={cid}
-                  className="flex items-center gap-3 bg-white rounded-lg border border-slate-200 px-3 py-2"
-                >
-                  {/* Color swatch + name */}
-                  <div className="flex items-center gap-2 min-w-[120px]">
-                    <span
-                      className="w-5 h-5 rounded-full border border-slate-300 shrink-0"
-                      style={{ backgroundColor: c?.hexCode || '#888' }}
-                    />
-                    <span className="text-sm font-medium text-slate-800">{c?.name ?? '—'}</span>
-                  </div>
+                <div key={cid} className="flex items-center gap-4 px-5 sm:px-6 py-3.5">
+                  <span className="w-8 h-8 rounded-full shrink-0 border border-neutral-200" style={{ backgroundColor: c?.hexCode || '#888' }} />
+                  <span className="text-sm font-medium text-neutral-800 min-w-[80px]">{c?.name ?? '—'}</span>
 
-                  {/* Quantity controls */}
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => decrementColorQty(cid)}
-                      disabled={qty <= minimumOrderQuantity}
-                      className="w-8 h-8 rounded-md border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                      −
-                    </button>
+                  {/* qty controls */}
+                  <div className="flex items-center gap-1">
+                    <button type="button" onClick={() => decrementColorQty(cid)} disabled={qty <= minimumOrderQuantity} className="w-8 h-8 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 disabled:opacity-30 flex items-center justify-center text-sm font-medium">−</button>
                     <input
                       type="number"
                       value={qty}
                       onChange={(e) => updateColorQty(cid, e.target.value)}
                       min={minimumOrderQuantity}
-                      className="w-20 h-8 px-2 rounded-md border border-slate-300 text-center text-slate-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-16 h-8 rounded-lg border border-neutral-200 text-center text-sm font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900"
                     />
-                    <button
-                      type="button"
-                      onClick={() => incrementColorQty(cid)}
-                      className="w-8 h-8 rounded-md border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 flex items-center justify-center"
-                    >
-                      +
-                    </button>
-                    <span className="text-slate-500 text-xs ml-1">kg</span>
+                    <button type="button" onClick={() => incrementColorQty(cid)} className="w-8 h-8 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 flex items-center justify-center text-sm font-medium">+</button>
+                    <span className="text-xs text-neutral-400 ml-1">kg</span>
                   </div>
 
-                  {/* Subtotal for this color */}
-                  <div className="ml-auto text-right">
-                    <span className="text-sm font-medium text-slate-800">
-                      Rs{colorSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
+                  <span className="ml-auto text-sm font-semibold text-neutral-900 tabular-nums">₹{fmt(sub)}</span>
 
-                  {/* Remove this color */}
-                  <button
-                    type="button"
-                    onClick={() => toggleColor(cid)}
-                    className="p-1 text-slate-400 hover:text-red-500 rounded"
-                    title="Remove color"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                  <button type="button" onClick={() => toggleColor(cid)} className="p-1 text-neutral-300 hover:text-red-500 transition-colors" title="Remove">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
               );
             })}
           </div>
 
-          {/* Price Breakdown */}
+          {/* totals */}
           {basePrice != null && (
-            <div className="mt-4 pt-3 border-t border-slate-200 space-y-1 bg-white rounded-lg p-3 border border-slate-100">
-              <p className="text-slate-600 text-sm">
-                Total quantity: <span className="font-medium text-slate-800">{totalQuantity} kg</span>
-                <span className="text-slate-400 ml-1">({selectedColors.length} color{selectedColors.length !== 1 ? 's' : ''})</span>
-              </p>
-              <p className="text-slate-600 text-sm">
-                Subtotal: <span className="font-medium text-slate-800">Rs{basePrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </p>
-              <p className="text-slate-600 text-sm">
-                SGST (9%): <span className="font-medium text-slate-800">Rs{sgstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </p>
-              <p className="text-slate-600 text-sm">
-                CGST (9%): <span className="font-medium text-slate-800">Rs{cgstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </p>
-              <p className="text-slate-500 text-xs">
-                Total GST (18%): <span className="font-medium text-slate-600">Rs{gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </p>
-              <p className="text-slate-700 text-sm font-medium pt-2 border-t border-slate-100">
-                Total (incl. GST): <span className="text-lg font-semibold text-slate-900">Rs{totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </p>
+            <div className="px-5 sm:px-6 py-5 bg-neutral-50 border-t border-neutral-200">
+              <div className="flex justify-between text-sm text-neutral-500 mb-1.5">
+                <span>Subtotal ({totalQuantity} kg)</span>
+                <span className="tabular-nums">₹{fmt(basePrice)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-neutral-500 mb-1.5">
+                <span>SGST (9%)</span>
+                <span className="tabular-nums">₹{fmt(sgstAmount)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-neutral-500 mb-3">
+                <span>CGST (9%)</span>
+                <span className="tabular-nums">₹{fmt(cgstAmount)}</span>
+              </div>
+              <div className="flex justify-between items-baseline pt-3 border-t border-neutral-200">
+                <span className="text-base font-semibold text-neutral-900">Total (incl. GST)</span>
+                <span className="text-2xl font-bold text-neutral-900 tabular-nums">₹{fmt(totalPrice)}</span>
+              </div>
             </div>
           )}
 
+          {/* actions */}
           {canAddToCart && (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="px-5 sm:px-6 py-4 border-t border-neutral-200 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={addingToCart}
-                className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600 disabled:opacity-50"
+                className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
+                  addedToCart
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-neutral-900 text-white hover:bg-neutral-800 shadow-lg shadow-neutral-900/10 hover:shadow-xl hover:-translate-y-0.5'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {addingToCart ? 'Adding…' : addedToCart ? 'Added to cart' : 'Add to cart'}
+                {addingToCart ? 'Adding…' : addedToCart ? '✓ Added to cart' : 'Add to cart'}
               </button>
               {addedToCart && (
-                <Link to="/cart" className="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                <Link to="/cart" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
                   View cart →
                 </Link>
               )}
