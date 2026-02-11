@@ -99,6 +99,10 @@ export default function Navbar() {
               Catalog
             </NavLink>
 
+            <NavLink to="/color-tools" className={navLinkClass}>
+              Color Tools
+            </NavLink>
+
             <button
               type="button"
               onClick={() => scrollToSection('contact')}

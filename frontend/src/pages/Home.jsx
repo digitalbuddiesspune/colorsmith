@@ -6,6 +6,7 @@ import CategoriesList from './CategoriesList';
 import HeroSection from '../components/HeroSection';
 import FAQ from '../components/FAQ';
 import ContactUs from '../components/ContactUs';
+import StartBusiness from '../components/StartBusiness';
 
 export default function Home() {
   const location = useLocation();
@@ -47,18 +48,23 @@ export default function Home() {
       <section id="categories" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
         <CategoriesList />
       </section>
+      <section id="start-business" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
+        <StartBusiness />
+      </section>
       
       <section id="why-color-smith" className="max-w-7xl mx-auto mt-16 pt-16 border-t border-slate-200/60 scroll-mt-20 px-4 lg:px-0">
         <WhyColorSmith />
       </section>
+
+     
       
       <section id="testimonials" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
         <Testimonials />
       </section>
-      <section id="faq" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0 mb-10">
+      <section id="faq" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
         <FAQ />
       </section>
-      <section id="contact" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0 mb-10">
+      <section id="contact" className="scroll-mt-20">
         <ContactUs />
       </section>
     </div>

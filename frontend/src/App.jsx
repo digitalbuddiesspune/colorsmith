@@ -26,8 +26,10 @@ import AdminColorSets from './pages/admin/AdminColorSets';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminColorSuggestions from './pages/admin/AdminColorSuggestions';
 import Policies from './pages/Policies';
 import Account from './pages/Account';
+import ColorTools from './pages/ColorTools';
 
 function App() {
   return (
@@ -51,6 +53,7 @@ function App() {
               <Route path="color-set/:id" element={<ColorSetDetail />} />
               <Route path="color-set/:id/edit" element={<ColorSetEdit />} />
               <Route path="account" element={<Account />} />
+              <Route path="color-tools" element={<ColorTools />} />
               <Route path="policies/:slug" element={<Policies />} />
             </Route>
             
@@ -67,6 +70,7 @@ function App() {
               <Route path="color-sets" element={<AdminColorSets />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="orders/:id" element={<AdminOrderDetail />} />
+              <Route path="color-suggestions" element={<AdminColorSuggestions />} />
             </Route>
             
             <Route path="*" element={<Navigate to="/" replace />} />

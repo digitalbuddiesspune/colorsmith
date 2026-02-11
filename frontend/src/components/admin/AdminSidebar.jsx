@@ -8,6 +8,7 @@ const navItems = [
   { to: '/admin/products', end: false, label: 'Products', icon: 'box' },
   { to: '/admin/grades', end: false, label: 'Grades', icon: 'grade' },
   { to: '/admin/colors', end: false, label: 'Colors', icon: 'color' },
+  { to: '/admin/color-suggestions', end: false, label: 'Color Suggestions', icon: 'palette' },
 ];
 
 function Icon({ name }) {

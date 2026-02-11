@@ -109,6 +109,13 @@ export const address = {
   delete: (id) => client.delete(`/address/${id}`),
 };
 
+export const colorSuggestions = {
+  create: (data) => client.post('/color-suggestions', data),
+  mine: () => client.get('/color-suggestions/mine'),
+  adminList: () => client.get('/color-suggestions'),
+  adminUpdate: (id, data) => client.put(`/color-suggestions/${id}`, data),
+};
+
 export const orders = {
   // Create Razorpay order for payment
   createRazorpayOrder: (amount) => client.post('/orders/razorpay/create', { amount }),

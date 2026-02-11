@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import rosePetalsBg from '../assets/rose-petals.svg';
 
 const policies = [
   { label: 'Privacy Policy', path: '/policies/privacy' },
@@ -14,12 +15,22 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="relative mt-auto overflow-hidden">
+      {/* rose petals SVG background */}
+      <img
+        src={rosePetalsBg}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* slight darkening overlay for readability */}
+      <div className="absolute inset-0 bg-black/30" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Policies */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
               Policies
             </h3>
             <ul className="space-y-2">
@@ -27,7 +38,7 @@ export default function Footer() {
                 <li key={p.path}>
                   <Link
                     to={p.path}
-                    className="text-slate-600 hover:text-brand-600 text-sm"
+                    className="text-white/70 hover:text-amber-300 text-sm transition-colors"
                   >
                     {p.label}
                   </Link>
@@ -38,17 +49,17 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
               Contact
             </h3>
-            <ul className="space-y-2 text-slate-600 text-sm">
+            <ul className="space-y-2 text-white/70 text-sm">
               <li>
-                <a href="mailto:contact@colorsmith.com" className="hover:text-brand-600">
+                <a href="mailto:contact@colorsmith.com" className="hover:text-amber-300 transition-colors">
                   contact@colorsmith.com
                 </a>
               </li>
               <li>
-                <a href="tel:+1234567890" className="hover:text-brand-600">
+                <a href="tel:+1234567890" className="hover:text-amber-300 transition-colors">
                   +1 (234) 567-890
                 </a>
               </li>
@@ -58,7 +69,7 @@ export default function Footer() {
 
           {/* Social */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
               Follow us
             </h3>
             <div className="flex gap-4">
@@ -68,7 +79,7 @@ export default function Footer() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-500 hover:text-brand-600 transition-colors"
+                  className="text-white/60 hover:text-amber-300 transition-colors"
                   aria-label={s.label}
                 >
                   <span className="sr-only">{s.label}</span>
@@ -79,8 +90,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-8 border-t border-slate-200 text-center text-slate-500 text-sm">
-          © {new Date().getFullYear()} Color Smith – Cosmetics Raw Materials & Finished Products
+        <div className="mt-10 pt-8 border-t border-white/15 text-center text-white/50 text-sm">
+          &copy; {new Date().getFullYear()} Color Smith – Cosmetics Raw Materials & Finished Products
         </div>
       </div>
     </footer>
