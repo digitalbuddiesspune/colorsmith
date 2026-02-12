@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import CategoriesDropdown from "./CategoriesDropdown";
 import  Logo  from "../assets/logo.png";
 import AuthModal from "./AuthModal";
+import { scrollToTop } from "../utility/scrollToTop";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -106,11 +107,11 @@ export default function Navbar() {
                 Categories
               </button>
 
-              <NavLink to="/catalog" className={navLinkClass}>
+              <NavLink to="/catalog" className={navLinkClass} onClick={scrollToTop}>
                 Catalog
               </NavLink>
 
-              <NavLink to="/color-tools" className={navLinkClass}>
+              <NavLink to="/color-tools" className={navLinkClass} onClick={scrollToTop}>
                 Color Tools
               </NavLink>
             </nav>

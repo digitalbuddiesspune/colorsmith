@@ -15,9 +15,10 @@ export default function ProductDetail() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // Current grade being configured in the UI (all grades remain selectable)
   const [selectedGradeId, setSelectedGradeId] = useState(null);
-  const [selectedColorIds, setSelectedColorIds] = useState([]);
-  const [colorQuantities, setColorQuantities] = useState({});
+  // Per-grade selections: { [gradeId]: { colorIds: [], colorQuantities: { [colorId]: qty } } }
+  const [selectionsByGrade, setSelectionsByGrade] = useState({});
   const [addedToCart, setAddedToCart] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const { addItem } = useCart();
@@ -32,8 +33,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setSelectedGradeId(null);
-    setSelectedColorIds([]);
-    setColorQuantities({});
+    setSelectionsByGrade({});
     setAddedToCart(false);
   }, [id]);
 
@@ -63,57 +63,135 @@ export default function ProductDetail() {
   const colors = colorsRaw.map((c) => (typeof c === 'object' && c != null ? c : { _id: c, name: '—', hexCode: '#888' }));
   const minimumOrderQuantity = product?.minimumOrderQuantity ?? 1;
 
-  /* ---------- color helpers ---------- */
+  /* ---------- per-grade selection helpers ---------- */
+  const getSelectionForGrade = (gradeId) => selectionsByGrade[gradeId] ?? { colorIds: [], colorQuantities: {} };
+
   const toggleColor = (colorId) => {
+    if (!selectedGradeId) return;
     setAddedToCart(false);
-    setSelectedColorIds((prev) => {
-      if (prev.includes(colorId)) {
-        setColorQuantities((q) => { const next = { ...q }; delete next[colorId]; return next; });
-        return prev.filter((cid) => cid !== colorId);
+    setSelectionsByGrade((prev) => {
+      const sel = prev[selectedGradeId] ?? { colorIds: [], colorQuantities: {} };
+      if (sel.colorIds.includes(colorId)) {
+        const nextQty = { ...sel.colorQuantities };
+        delete nextQty[colorId];
+        return {
+          ...prev,
+          [selectedGradeId]: {
+            colorIds: sel.colorIds.filter((cid) => cid !== colorId),
+            colorQuantities: nextQty,
+          },
+        };
       }
-      setColorQuantities((q) => ({ ...q, [colorId]: minimumOrderQuantity }));
-      return [...prev, colorId];
+      return {
+        ...prev,
+        [selectedGradeId]: {
+          colorIds: [...sel.colorIds, colorId],
+          colorQuantities: { ...sel.colorQuantities, [colorId]: minimumOrderQuantity },
+        },
+      };
     });
   };
-  const getColorQty = (colorId) => colorQuantities[colorId] ?? minimumOrderQuantity;
-  const updateColorQty = (colorId, value) => {
-    const p = parseInt(value, 10);
-    if (!isNaN(p) && p >= minimumOrderQuantity) { setColorQuantities((q) => ({ ...q, [colorId]: p })); setAddedToCart(false); }
-  };
-  const incrementColorQty = (colorId) => { setColorQuantities((q) => ({ ...q, [colorId]: (q[colorId] ?? minimumOrderQuantity) + 1 })); setAddedToCart(false); };
-  const decrementColorQty = (colorId) => {
-    const cur = colorQuantities[colorId] ?? minimumOrderQuantity;
-    if (cur > minimumOrderQuantity) { setColorQuantities((q) => ({ ...q, [colorId]: cur - 1 })); setAddedToCart(false); }
+
+  const getColorQty = (gradeId, colorId) => {
+    const sel = getSelectionForGrade(gradeId);
+    return sel.colorQuantities[colorId] ?? minimumOrderQuantity;
   };
 
-  const selectedGrade = grades.find((g) => getGradeId(g) === selectedGradeId);
-  const selectedColors = colors.filter((c) => selectedColorIds.includes(getColorId(c)));
-  const totalQuantity = selectedColors.reduce((sum, c) => sum + getColorQty(getColorId(c)), 0);
-  const basePrice = selectedGrade?.price != null && totalQuantity > 0 ? Number(selectedGrade.price) * totalQuantity : null;
+  const updateColorQty = (gradeId, colorId, value) => {
+    const p = parseInt(value, 10);
+    if (isNaN(p) || p < minimumOrderQuantity) return;
+    setAddedToCart(false);
+    setSelectionsByGrade((prev) => {
+      const sel = prev[gradeId] ?? { colorIds: [], colorQuantities: {} };
+      if (!sel.colorIds.includes(colorId)) return prev;
+      return {
+        ...prev,
+        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: p } },
+      };
+    });
+  };
+
+  const incrementColorQty = (gradeId, colorId) => {
+    setAddedToCart(false);
+    setSelectionsByGrade((prev) => {
+      const sel = prev[gradeId] ?? { colorIds: [], colorQuantities: {} };
+      const cur = sel.colorQuantities[colorId] ?? minimumOrderQuantity;
+      return {
+        ...prev,
+        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: cur + 1 } },
+      };
+    });
+  };
+
+  const decrementColorQty = (gradeId, colorId) => {
+    const cur = getColorQty(gradeId, colorId);
+    if (cur <= minimumOrderQuantity) return;
+    setAddedToCart(false);
+    setSelectionsByGrade((prev) => {
+      const sel = prev[gradeId] ?? { colorIds: [], colorQuantities: {} };
+      return {
+        ...prev,
+        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: cur - 1 } },
+      };
+    });
+  };
+
+  const removeColorFromGrade = (gradeId, colorId) => {
+    setAddedToCart(false);
+    setSelectionsByGrade((prev) => {
+      const sel = prev[gradeId] ?? { colorIds: [], colorQuantities: {} };
+      const nextQty = { ...sel.colorQuantities };
+      delete nextQty[colorId];
+      return {
+        ...prev,
+        [gradeId]: {
+          colorIds: sel.colorIds.filter((cid) => cid !== colorId),
+          colorQuantities: nextQty,
+        },
+      };
+    });
+  };
+
+  // Current grade (for price preview and color UI)
+  const selectedGrade = grades.find((g) => getGradeId(g) === selectedGradeId) ?? null;
+  const currentSelection = getSelectionForGrade(selectedGradeId);
+  const selectedColorIds = currentSelection.colorIds;
+
+  // All grade+color lines for summary and cart (flatten selectionsByGrade)
+  const orderLines = [];
+  grades.forEach((g) => {
+    const gid = getGradeId(g);
+    const sel = getSelectionForGrade(gid);
+    sel.colorIds.forEach((cid) => {
+      const color = colors.find((c) => getColorId(c) === cid);
+      if (color) orderLines.push({ grade: g, gradeId: gid, color, colorId: cid, qty: getColorQty(gid, cid) });
+    });
+  });
+
+  const totalQuantity = orderLines.reduce((sum, line) => sum + line.qty, 0);
+  const basePrice = orderLines.length > 0 ? orderLines.reduce((sum, line) => sum + Number(line.grade?.price ?? 0) * line.qty, 0) : null;
   const SGST_RATE = 0.09;
   const CGST_RATE = 0.09;
   const sgstAmount = basePrice != null ? basePrice * SGST_RATE : null;
   const cgstAmount = basePrice != null ? basePrice * CGST_RATE : null;
   const gstAmount = sgstAmount != null && cgstAmount != null ? sgstAmount + cgstAmount : null;
   const totalPrice = basePrice != null && gstAmount != null ? basePrice + gstAmount : null;
-  const canAddToCart = selectedGrade && selectedColors.length > 0 && totalPrice != null;
+  const canAddToCart = orderLines.length > 0 && totalPrice != null;
 
   const handleAddToCart = async () => {
     if (!canAddToCart || addingToCart) return;
     setAddingToCart(true);
     try {
-      for (const color of selectedColors) {
-        const cid = getColorId(color);
-        const qty = getColorQty(cid);
+      for (const line of orderLines) {
         await addItem({
           productId: product._id,
           productName: product?.name ?? '',
           productImage: product?.image ?? null,
-          grade: { id: getGradeId(selectedGrade), name: selectedGrade.name, price: selectedGrade.price },
-          colors: [{ id: cid, name: color?.name ?? '', hexCode: color?.hexCode ?? '#888' }],
-          quantity: qty,
-          unitPrice: selectedGrade?.price ?? 0,
-          totalPrice: Number(selectedGrade.price) * qty,
+          grade: { id: line.gradeId, name: line.grade?.name, price: line.grade?.price },
+          colors: [{ id: line.colorId, name: line.color?.name ?? '', hexCode: line.color?.hexCode ?? '#888' }],
+          quantity: line.qty,
+          unitPrice: line.grade?.price ?? 0,
+          totalPrice: Number(line.grade?.price ?? 0) * line.qty,
         });
       }
       setAddedToCart(true);
@@ -200,7 +278,7 @@ export default function ProductDetail() {
                   <button
                     key={gid}
                     type="button"
-                    onClick={() => { setSelectedGradeId(gid); setAddedToCart(false); }}
+                    onClick={() => { setSelectedGradeId(gid); }}
                     className={`w-full px-5 py-4 rounded-xl border text-left flex justify-between items-center gap-4 transition-all ${
                       sel
                         ? 'border-neutral-900 bg-neutral-900 text-white shadow-lg shadow-neutral-900/10'
@@ -227,8 +305,13 @@ export default function ProductDetail() {
           <div className="flex items-center gap-2 mb-4">
             <span className="w-7 h-7 rounded-full bg-neutral-900 text-white text-xs font-bold flex items-center justify-center">2</span>
             <h2 className="text-lg font-semibold text-neutral-900">Select colors</h2>
+            {selectedGradeId && (
+              <span className="text-xs text-neutral-500">(for selected grade)</span>
+            )}
           </div>
-          {colors.length ? (
+          {!selectedGradeId ? (
+            <p className="text-neutral-400 text-sm">Select a grade above, then choose colors. You can change grade and add different shades for each.</p>
+          ) : colors.length ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {colors.map((c) => {
                 const cid = getColorId(c);
@@ -263,40 +346,42 @@ export default function ProductDetail() {
       </div>
 
       {/* ---- summary ---- */}
-      {selectedGrade && selectedColors.length > 0 && (
+      {orderLines.length > 0 && (
         <section className="mt-10 rounded-2xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
           <div className="px-5 sm:px-6 py-4 bg-neutral-900 text-white flex items-center justify-between">
             <h3 className="font-semibold">Order summary</h3>
-            <span className="text-sm text-neutral-400">{selectedColors.length} color{selectedColors.length !== 1 && 's'} · {selectedGrade.name}</span>
+            <span className="text-sm text-neutral-400">{orderLines.length} shade{orderLines.length !== 1 && 's'} across {Object.keys(selectionsByGrade).filter((gid) => getSelectionForGrade(gid).colorIds.length > 0).length} grade{Object.keys(selectionsByGrade).filter((gid) => getSelectionForGrade(gid).colorIds.length > 0).length !== 1 && 's'}</span>
           </div>
 
           <div className="divide-y divide-neutral-100">
-            {selectedColors.map((c) => {
-              const cid = getColorId(c);
-              const qty = getColorQty(cid);
-              const sub = selectedGrade?.price != null ? Number(selectedGrade.price) * qty : 0;
+            {orderLines.map((line) => {
+              const { grade, gradeId, color, colorId, qty } = line;
+              const sub = grade?.price != null ? Number(grade.price) * qty : 0;
               return (
-                <div key={cid} className="flex items-center gap-4 px-5 sm:px-6 py-3.5">
-                  <span className="w-8 h-8 rounded-full shrink-0 border border-neutral-200" style={{ backgroundColor: c?.hexCode || '#888' }} />
-                  <span className="text-sm font-medium text-neutral-800 min-w-[80px]">{c?.name ?? '—'}</span>
+                <div key={`${gradeId}-${colorId}`} className="flex items-center gap-4 px-5 sm:px-6 py-3.5">
+                  <span className="w-8 h-8 rounded-full shrink-0 border border-neutral-200" style={{ backgroundColor: color?.hexCode || '#888' }} />
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-neutral-800 block">{color?.name ?? '—'}</span>
+                    <span className="text-xs text-neutral-500">{grade?.name ?? '—'}</span>
+                  </div>
 
                   {/* qty controls */}
                   <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => decrementColorQty(cid)} disabled={qty <= minimumOrderQuantity} className="w-8 h-8 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 disabled:opacity-30 flex items-center justify-center text-sm font-medium">−</button>
+                    <button type="button" onClick={() => decrementColorQty(gradeId, colorId)} disabled={qty <= minimumOrderQuantity} className="w-8 h-8 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 disabled:opacity-30 flex items-center justify-center text-sm font-medium">−</button>
                     <input
                       type="number"
                       value={qty}
-                      onChange={(e) => updateColorQty(cid, e.target.value)}
+                      onChange={(e) => updateColorQty(gradeId, colorId, e.target.value)}
                       min={minimumOrderQuantity}
                       className="w-16 h-8 rounded-lg border border-neutral-200 text-center text-sm font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900"
                     />
-                    <button type="button" onClick={() => incrementColorQty(cid)} className="w-8 h-8 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 flex items-center justify-center text-sm font-medium">+</button>
+                    <button type="button" onClick={() => incrementColorQty(gradeId, colorId)} className="w-8 h-8 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 flex items-center justify-center text-sm font-medium">+</button>
                     <span className="text-xs text-neutral-400 ml-1">kg</span>
                   </div>
 
                   <span className="ml-auto text-sm font-semibold text-neutral-900 tabular-nums">₹{fmt(sub)}</span>
 
-                  <button type="button" onClick={() => toggleColor(cid)} className="p-1 text-neutral-300 hover:text-red-500 transition-colors" title="Remove">
+                  <button type="button" onClick={() => removeColorFromGrade(gradeId, colorId)} className="p-1 text-neutral-300 hover:text-red-500 transition-colors" title="Remove">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>

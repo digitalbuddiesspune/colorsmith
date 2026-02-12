@@ -10,9 +10,7 @@ export default function Layout() {
       <main className="flex-1">
         <Outlet />
       </main>
-      <div className="pb-20 sm:pb-0">
-        <Footer />
-      </div>
+      <Footer />
       <BottomNav />
     </div>
   );

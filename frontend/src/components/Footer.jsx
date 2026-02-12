@@ -16,14 +16,14 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-black mt-auto overflow-hidden">
+    <footer className="bg-black mt-auto overflow-hidden pb-20 sm:pb-0">
       {/* rose petals SVG background */}
      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-          <img src={Logo} alt="Color Smith" className="h-16 mb-4" />
+          <img src={Logo} alt="Color Smith" className="lg:h-16 h-10 mb-4" />
             {/* <img src={logoImg} alt="Color Smith" className="w-20 h-20" /> */}
             
             <p className="text-white/70 text-sm">

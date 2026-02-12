@@ -46,7 +46,7 @@ export default function CategoriesList() {
               <img src={category.image} alt={category.name} className="w-full h-full object-contain rounded-lg" />
             </div>
             <div>
-              <h2 className="lg:text-xl uppercase text-center col-span-2 text-sm font-medium text-slate-900  transition-colors text-center truncate">
+              <h2 className="lg:text-xl uppercase text-center col-span-2 text-sm font-medium text-slate-900  transition-colors text-center truncate mt-2">
                 {category.name}
               </h2>
               {/* <p className="text-slate-500 text-sm">View products</p> */}

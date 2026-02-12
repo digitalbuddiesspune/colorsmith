@@ -59,12 +59,21 @@ export const createRazorpayOrder = async (req, res) => {
       keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    const msg = error.message || error.error?.description || 'Failed to create payment order';
+    const rawMsg = error.message || error.error?.description || 'Failed to create payment order';
+    const isAuthFailed =
+      rawMsg.toLowerCase().includes('authentication failed') ||
+      error.statusCode === 401 ||
+      error.error?.code === 'BAD_REQUEST_AUTHENTICATION_FAILED';
+
+    const msg = isAuthFailed
+      ? 'Invalid Razorpay API keys. Ensure Key ID and Key Secret are a matching pair (both Test or both Live) and have no extra spaces.'
+      : rawMsg;
     const status = error.statusCode || error.status || 500;
     console.error('Razorpay order creation error:', {
-      message: msg,
+      message: rawMsg,
       code: error.code,
       statusCode: error.statusCode,
+      hint: isAuthFailed ? 'Check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are from the same key pair in Razorpay Dashboard.' : undefined,
       full: error,
     });
     return res.status(status >= 400 && status < 600 ? status : 500).json({

@@ -7,7 +7,7 @@ const desktopImages = [
     alt: 'Colorful nail polish bottles',
   },
   {
-    src: 'https://res.cloudinary.com/dygteqnrv/image/upload/v1770744842/cosmetics-background-with-realistic-style_1_sim4t7.jpg',
+    src: 'https://res.cloudinary.com/dygteqnrv/image/upload/v1770900899/Brown_Modern_Minimalist_Eyelash_Beauty_Salon_Banner_1920_x_600_px_zjkmqu.png',
     alt: 'Colorful nail polish bottles',
   },
   
@@ -15,14 +15,15 @@ const desktopImages = [
 
 // Square banners for mobile (1:1 ratio)
 const mobileImages = [
+  
+  {
+    src: 'https://res.cloudinary.com/dygteqnrv/image/upload/v1770900933/Brown_Modern_Minimalist_Eyelash_Beauty_Salon_Banner_1920_x_600_px_1080_x_1080_px_isgkus.png',
+    alt: 'Lipstick shades collection',
+  },
   {
     src: 'https://res.cloudinary.com/dygteqnrv/image/upload/v1770744031/Peach_Elegant_3D_Realistic_Illustrated_Promotional_Cosmetic_Products_Banner_1920_x_600_px_1080_x_1080_px_owik1i.png',
     alt: 'Colorful nail polish bottles',
-  },
-  {
-    src: 'https://res.cloudinary.com/dygteqnrv/image/upload/v1770457463/set-decorative-cosmetics-pink-pastel-background-created-with-generative-ai-technology.jpg_1_1_inig8e.jpg',
-    alt: 'Lipstick shades collection',
-  },
+  }
 ];
 
 export default function HeroSection() {

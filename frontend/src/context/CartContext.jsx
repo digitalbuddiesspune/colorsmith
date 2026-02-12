@@ -199,7 +199,8 @@ export function CartProvider({ children }) {
     fetchCart();
   }, [fetchCart]);
 
-  const itemCount = cart.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+  // Number of distinct items (lines) in cart, not sum of quantities
+  const itemCount = cart.length;
   const subtotal = cart.reduce((sum, item) => sum + (item.totalPrice ?? 0), 0);
   // GST split into SGST (9%) and CGST (9%) = 18% total
   const SGST_RATE = 0.09; // 9% SGST

@@ -48,7 +48,7 @@ export default function ColorTools() {
       <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-3">Color Tools</h1>
         <p className="text-neutral-500 max-w-2xl">
-          Match colors from photos, suggest new shades, or preview how colors look on products — all powered by smart color analysis.
+          Match colors from photos, suggest new shades, or preview how colors look on products — all powered by smart color analysis. In AI Color Match, you can allow camera access when prompted to capture a photo for color matching.
         </p>
       </div>
 
@@ -88,6 +88,7 @@ function AIColorMatch({ allColors, loading }) {
   const [imgPreview, setImgPreview] = useState(null);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [stream, setStream] = useState(null);
+  const [cameraError, setCameraError] = useState(null);
 
   const extractColor = useCallback((imgSrc) => {
     const img = new Image();
@@ -133,12 +134,23 @@ function AIColorMatch({ allColors, loading }) {
   };
 
   const openCamera = async () => {
+    setCameraError(null);
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError('Camera is not supported in this browser. Please use "Upload Image" instead.');
+      return;
+    }
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       setStream(s);
       setCameraOpen(true);
       setTimeout(() => { if (videoRef.current) videoRef.current.srcObject = s; }, 100);
-    } catch { alert('Camera access denied.'); }
+    } catch (err) {
+      const denied = err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError';
+      setCameraError(denied
+        ? 'Camera access was denied. Please allow camera access in your browser settings, or use "Upload Image" instead.'
+        : 'Could not access the camera. Make sure it is connected and not in use by another app, or try "Upload Image".'
+      );
+    }
   };
 
   const capturePhoto = () => {
@@ -157,9 +169,10 @@ function AIColorMatch({ allColors, loading }) {
     stream?.getTracks().forEach((t) => t.stop());
     setStream(null);
     setCameraOpen(false);
+    setCameraError(null);
   };
 
-  const reset = () => { setExtractedColor(null); setMatches([]); setImgPreview(null); stopCamera(); };
+  const reset = () => { setExtractedColor(null); setMatches([]); setImgPreview(null); setCameraError(null); stopCamera(); };
 
   return (
     <div>
@@ -172,19 +185,28 @@ function AIColorMatch({ allColors, loading }) {
             <svg className="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
           </div>
           <h3 className="text-lg font-semibold text-neutral-900 mb-2">Upload or capture a color</h3>
-          <p className="text-neutral-500 text-sm mb-6 max-w-md mx-auto">
+          <p className="text-neutral-500 text-sm mb-4 max-w-md mx-auto">
             Take a photo or upload an image — we'll extract the dominant color and find the closest matches in our catalog.
+          </p>
+          <p className="text-neutral-500 text-xs mb-6 max-w-md mx-auto">
+            <strong className="text-neutral-700">Camera:</strong> When you tap Camera, your browser will ask for permission to use your camera. Allow access to capture a photo for color matching — we use it only for this feature.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <button onClick={openCamera} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-neutral-900 text-white font-semibold text-sm hover:bg-neutral-800 transition-all shadow-lg">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
-              Camera
+              Use camera (allow access when prompted)
             </button>
             <button onClick={() => fileRef.current?.click()} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-neutral-300 text-neutral-700 font-semibold text-sm hover:border-neutral-400 hover:bg-neutral-50 transition-all">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
               Upload Image
             </button>
           </div>
+          {cameraError && (
+            <div className="mt-6 mx-auto max-w-md px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-left">
+              <p className="text-sm text-amber-800">{cameraError}</p>
+              <button type="button" onClick={() => setCameraError(null)} className="mt-2 text-sm font-semibold text-amber-700 hover:underline">Dismiss</button>
+            </div>
+          )}
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
         </div>
       )}

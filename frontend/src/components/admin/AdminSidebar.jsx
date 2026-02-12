@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { scrollToTop } from '../../utility/scrollToTop';
 
 const navItems = [
   { to: '/admin', end: true, label: 'Dashboard', icon: 'dashboard' },
@@ -93,6 +94,7 @@ export default function AdminSidebar() {
             key={item.to}
             to={item.to}
             end={item.end}
+            onClick={scrollToTop}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
