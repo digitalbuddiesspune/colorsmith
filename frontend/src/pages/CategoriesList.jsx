@@ -34,7 +34,7 @@ export default function CategoriesList() {
       
       </div>
     
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-8 mt-10 rounded-lg">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8 gap-4 mt-10 rounded-lg">
         {list.map((category) => (
           <Link
             key={category._id}
