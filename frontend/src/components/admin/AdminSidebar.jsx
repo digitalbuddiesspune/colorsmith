@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { scrollToTop } from '../../utility/scrollToTop';
+import Logo from '../../assets/logo.png';
 
 const navItems = [
   { to: '/admin', end: true, label: 'Dashboard', icon: 'dashboard' },
@@ -85,8 +86,10 @@ export default function AdminSidebar() {
   return (
     <aside className="w-60 shrink-0 bg-slate-900 border-r border-slate-700 flex flex-col h-screen sticky top-0">
       <div className="p-4 border-b border-slate-700">
-        <h1 className="text-lg font-semibold text-white tracking-tight">Color Smith</h1>
-        <p className="text-slate-400 text-xs mt-0.5">Admin</p>
+        <div className="flex items-center gap-3">
+          <img src={Logo} alt="Color Smith" className="h-9 w-auto" />
+          
+        </div>
       </div>
       <nav className="flex-1 p-3 space-y-0.5">
         {navItems.map((item) => (

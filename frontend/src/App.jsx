@@ -20,6 +20,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminCategoryForm from './pages/admin/AdminCategoryForm';
 import AdminProducts from './pages/admin/AdminProducts';
+import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminGrades from './pages/admin/AdminGrades';
 import AdminColors from './pages/admin/AdminColors';
 import AdminColorSets from './pages/admin/AdminColorSets';
@@ -65,6 +66,8 @@ function App() {
               <Route path="categories/new" element={<AdminCategoryForm />} />
               <Route path="categories/:id/edit" element={<AdminCategoryForm />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="products/new" element={<AdminProductForm />} />
+              <Route path="products/:id/edit" element={<AdminProductForm />} />
               <Route path="grades" element={<AdminGrades />} />
               <Route path="colors" element={<AdminColors />} />
               <Route path="color-sets" element={<AdminColorSets />} />

@@ -147,8 +147,13 @@ export default function AdminOrders() {
                     onClick={() => handleRowClick(order._id)}
                     className="hover:bg-slate-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-4 text-sm font-medium text-slate-900">
-                      {formatOrderId(order.orderNumber || order._id)}
+                    <td className="px-4 py-4 text-sm font-medium text-slate-900" onClick={(e) => e.stopPropagation()}>
+                      <Link
+                        to={`/admin/orders/${order._id}`}
+                        className="hover:text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset rounded"
+                      >
+                        {formatOrderId(order.orderNumber || order._id)}
+                      </Link>
                     </td>
                     <td className="px-4 py-4">
                       <div className="text-sm text-slate-900">{order.user?.name || 'N/A'}</div>
