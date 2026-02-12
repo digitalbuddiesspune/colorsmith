@@ -62,7 +62,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href="tel:+1234567890" className="hover:text-amber-300 transition-colors">
-                  +1 (234) 567-890
+                  +91 93110 29421
                 </a>
               </li>
               <li>B2B inquiries welcome</li>

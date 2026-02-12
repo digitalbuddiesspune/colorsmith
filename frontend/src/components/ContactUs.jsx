@@ -157,7 +157,7 @@ export default function ContactUs() {
   return (
     <section
       id="contact"
-      className="overflow-hidden scroll-mt-20 bg-white"
+      className="overflow-hidden scroll-mt-20 bg-slate-50"
       style={{
         marginLeft: 'calc(-50vw + 50%)',
         marginRight: 'calc(-50vw + 50%)',
@@ -165,12 +165,12 @@ export default function ContactUs() {
     >
     
 
-      <div className="px-4 py-10 lg:py-16 lg:px-0 scroll-mt-20 bg-gradient-to-b from-[#F57799]/10 to-[#F57799]/0">
+      <div className="px-4 py-10 lg:py-16 lg:px-0 scroll-mt-20 border-t border-slate-200 ">
       <div className="max-w-7xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
           {/* Left — info */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#F57799] mb-2">Get in touch</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Get in touch</h2>
             <p className="text-black/60 mb-8 leading-relaxed">
               Interested in our products or need a custom formulation? Fill out the form and our team will get back to you within 24 hours.
             </p>
@@ -353,7 +353,7 @@ export default function ContactUs() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full px-6 py-3 rounded-xl bg-[#F57799] text-white font-semibold hover:bg-[#FB9B8F] transition-all shadow-lg shadow-[#F57799]/20 hover:shadow-[#F57799]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-all shadow-lg shadow-[#F57799]/20 hover:shadow-[#F57799]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Sending...' : 'Send inquiry'}
               </button>

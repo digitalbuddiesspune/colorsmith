@@ -28,7 +28,7 @@ export default function CategoriesList() {
   if (error) return <div className="py-10 text-red-600">{error}</div>;
 
   return (
-    <div className="py-10 ">
+    <div className="py-20">
       <div className='text-center'>
       <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2 uppercase">Shop By Colllection</h1>
       

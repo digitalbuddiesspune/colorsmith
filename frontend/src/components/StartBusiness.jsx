@@ -51,14 +51,12 @@ const steps = [
 export default function StartBusiness() {
   return (
     <section
-      className="relative mt-16 -mx-4 sm:-mx-6 lg:-mx-8"
-   
-     
+      className="relative -mx-4 sm:-mx-6 lg:-mx-8"
     >
      
 
       {/* scrolling content */}
-      <div className="max-w-7xl mx-auto px-4  py-20">
+      <div className="max-w-7xl mx-auto px-4  py-10">
         {/* header */}
         <div className="mb-5 uppercase text-center">
           <h2 className="text-3xl font-bold leading-[1.1] mb-10">Start your cosmetics business in 4 steps</h2>
@@ -81,7 +79,7 @@ export default function StartBusiness() {
                 <h3 className="text-slate-900 font-semibold text-base sm:text-lg mb-1">
                   {step.title}
                 </h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-2.5">
+                <p className="hidden lg:block text-slate-600 text-xs lg:text-sm leading-relaxed mb-2.5">
                   {step.desc}
                 </p>
                 <Link
