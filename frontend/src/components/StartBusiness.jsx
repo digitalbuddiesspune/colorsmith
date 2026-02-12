@@ -52,58 +52,41 @@ export default function StartBusiness() {
   return (
     <section
       className="relative mt-16 -mx-4 sm:-mx-6 lg:-mx-8"
-      style={{
-        marginLeft: 'calc(-50vw + 50%)',
-        marginRight: 'calc(-50vw + 50%)',
-      }}
+   
+     
     >
-      {/* rose petals SVG background — fixed parallax */}
-      <div className="absolute inset-0" style={{ clipPath: 'inset(0)' }}>
-        <img
-          src={rosePetalsBg}
-          alt=""
-          aria-hidden="true"
-          className="fixed top-0 left-0 w-screen h-screen object-cover pointer-events-none"
-        />
-      </div>
+     
 
       {/* scrolling content */}
-      <div className="relative z-10 max-w-3xl mx-auto px-6 sm:px-10 py-20 sm:py-28 lg:py-36">
+      <div className="max-w-7xl mx-auto px-4  py-20">
         {/* header */}
-        <div className="mb-14">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] mb-5">
-            <span className="text-white">Start your cosmetics</span>
-            <br />
-            <span className="text-amber-300">business in 4 steps</span>
-          </h2>
-          <p className="text-neutral-300/80 text-base sm:text-lg leading-relaxed max-w-4xl">
-            From raw materials to finished products — everything you need to launch or scale your beauty brand, all in one place.
-          </p>
+        <div className="mb-5 uppercase text-center">
+          <h2 className="text-3xl font-bold leading-[1.1] mb-10">Start your cosmetics business in 4 steps</h2>
         </div>
 
         {/* steps */}
-        <div className="space-y-4 mb-14">
+        <div className="space-y-4 mb-14 rounded-lg">
           {steps.map((step) => (
             <div
               key={step.num}
-              className="group relative flex items-start gap-5 sm:gap-6 bg-white/[0.05] hover:bg-white/[0.09] backdrop-blur-md border border-white/[0.08] hover:border-amber-300/20 rounded-2xl p-5 sm:p-6 transition-all duration-300"
+              className="group relative flex items-start gap-5 sm:gap-6 bg-white/[0.05] hover:bg-slate-100 backdrop-blur-md border border-slate-200 rounded-2xl p-5 sm:p-6 transition-all duration-300"
             >
               {/* step number */}
-              <div className="shrink-0 w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-neutral-900 text-sm font-bold shadow-lg shadow-amber-400/30">
+              <div className="shrink-0 w-10 h-10 rounded-full bg-[#3c3c3c] flex items-center justify-center text-white text-sm font-bold shadow-lg">
                 {step.num}
               </div>
 
               {/* content */}
               <div className="flex-1 min-w-0">
-                <h3 className="text-white font-semibold text-base sm:text-lg mb-1">
+                <h3 className="text-slate-900 font-semibold text-base sm:text-lg mb-1">
                   {step.title}
                 </h3>
-                <p className="text-neutral-400 text-sm leading-relaxed mb-2.5">
+                <p className="text-slate-600 text-sm leading-relaxed mb-2.5">
                   {step.desc}
                 </p>
                 <Link
                   to={step.link.to}
-                    className="inline-flex items-center gap-1.5 text-amber-300 text-sm font-medium hover:text-amber-200 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-[#3c3c3c] text-sm font-medium hover:text-[#3c3c3c] transition-colors"
                 >
                   {step.link.label}
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -112,29 +95,18 @@ export default function StartBusiness() {
                 </Link>
               </div>
 
-              {/* icon */}
-              <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-xl bg-amber-400/10 items-center justify-center text-amber-300/50 group-hover:text-amber-300 transition-colors">
-                {step.icon}
-              </div>
+              
             </div>
           ))}
         </div>
 
         {/* CTA button */}
         <Link
-          to="/register"
-            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-neutral-900 font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg shadow-amber-400/25 hover:shadow-amber-400/40 hover:-translate-y-0.5"
+          to="/catalog"
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-[#3c3c3c] text-white font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:-translate-y-0.5"
         >
-          Get Started Now
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
+          Browse Catalog
         </Link>
-
-        {/* trust badge */}
-        <p className="text-center text-neutral-400/60 text-xs tracking-[0.2em] uppercase font-medium mt-10">
-          Trusted by 5,000+ beauty entrepreneurs
-        </p>
       </div>
     </section>
   );

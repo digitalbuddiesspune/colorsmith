@@ -15,19 +15,22 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative mt-auto overflow-hidden">
+    <footer className="bg-black mt-auto overflow-hidden">
       {/* rose petals SVG background */}
-      <img
-        src={rosePetalsBg}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      {/* slight darkening overlay for readability */}
-      <div className="absolute inset-0 bg-black/30" />
+     
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 className="text-xl font-semibold text-white uppercase tracking-wider mb-4">
+              Color Smith
+            </h3>
+            {/* <img src={logoImg} alt="Color Smith" className="w-20 h-20" /> */}
+            
+            <p className="text-white/70 text-sm">
+              Color Smith is a leading provider of cosmetics raw materials and finished products. We offer a wide range of products, including nail lacquers, lipsticks, lip gloss, primers, eyeliners, mascara & more — multiple grades and colors.
+            </p>
+          </div>
           {/* Policies */}
           <div>
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">

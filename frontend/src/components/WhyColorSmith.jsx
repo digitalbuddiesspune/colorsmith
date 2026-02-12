@@ -14,16 +14,7 @@ const points = [
     description: 'Scale with volume pricing and dedicated support for large orders.',
     icon: 'bulk',
   },
-  {
-    title: 'Regulatory Documents',
-    description: 'Access COAs, TDS, and compliance documentation when you need it.',
-    icon: 'docs',
-  },
-  {
-    title: 'Consistent Batch Quality',
-    description: 'Strict QC and batch tracking for repeatable results.',
-    icon: 'quality',
-  },
+  
 ];
 
 function Icon({ name }) {
@@ -67,23 +58,21 @@ function Icon({ name }) {
 }
 
 export default function WhyColorSmith() {
+  const video = "https://res.cloudinary.com/dygteqnrv/video/upload/v1770870820/3a404e5d1144eba957859cf14298b75d_720w_rggrjq.mp4"
   return (
     <section id="why-color-smith" className="scroll-mt-20">
-      <div className='text-center'>
-      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Why Color Smith</h2>
-      <p className="text-slate-600 mb-10 w-full max-w-5xl mx-auto">
-        We support brands and manufacturers with a full range of cosmetics raw materials and finished products, from multiple grades to custom color sets.
-      </p>
-      </div>
-     
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+       <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10 uppercase text-center">Why Color Smith</h2>
+      
+      <video src={video} autoPlay loop muted playsInline className="h-96 w-full object-cover rounded-lg" />
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
         {points.map((item, i) => (
           <div
             key={i}
             className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow transition-shadow"
           >
-            <Icon name={item.icon} />
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">{item.title}</h3>
+          
+            <h3 className="mt-4 text-lg font-semibold text-golde uppercase">{item.title}</h3>
             <p className="mt-2 text-slate-600 text-sm">{item.description}</p>
           </div>
         ))}

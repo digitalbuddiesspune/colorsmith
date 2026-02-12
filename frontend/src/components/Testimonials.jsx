@@ -151,11 +151,9 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="mt-16 pt-16 border-t border-slate-200">
-      <div className='text-center'> <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">What our clients say</h2>
-      <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
-        Brands and manufacturers trust Color Smith for raw materials and finished products.
-      </p>
+    <section className="mt-16 pt-16 border-t border-slate-200 scroll-mt-20 mb-10">
+      <div className='text-center'> <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4 uppercase text-center lg:mb-10">What our clients say</h2>
+
       </div>
      
       {/* Desktop: grid layout */}

@@ -28,15 +28,13 @@ export default function CategoriesList() {
   if (error) return <div className="py-10 text-red-600">{error}</div>;
 
   return (
-    <div className="py-10">
+    <div className="py-10 ">
       <div className='text-center'>
-      <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2">Categories</h1>
-      <p className="text-slate-600 mb-5 w-full max-w-5xl mx-auto">
-        Browse our range of cosmetics finished products and raw materials by category.
-      </p>
+      <h1 className="lg:text-3xl text-2xl font-semibold text-slate-900 mb-2 uppercase">Shop By Colllection</h1>
+      
       </div>
     
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-8 mt-10 rounded-lg">
         {list.map((category) => (
           <Link
             key={category._id}
@@ -45,7 +43,7 @@ export default function CategoriesList() {
             className=""
           >
             <div>
-              <img src={category.image} alt={category.name} className="w-full h-full object-contain " />
+              <img src={category.image} alt={category.name} className="w-full h-full object-contain rounded-lg" />
             </div>
             <div>
               <h2 className="lg:text-xl uppercase text-center col-span-2 text-sm font-medium text-slate-900  transition-colors text-center truncate">

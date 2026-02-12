@@ -70,7 +70,7 @@ function FAQItem({ faq, isOpen, onToggle }) {
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer"
       >
-        <span className="text-base font-semibold text-slate-900">{faq.question}</span>
+        <span className="lg:text-base text-sm font-semibold text-slate-900">{faq.question}</span>
         <ChevronIcon open={isOpen} />
       </button>
       <div
@@ -95,12 +95,10 @@ export default function FAQ() {
   };
 
   return (
-    <section className="mt-16 pt-16 border-t border-slate-200">
+    <section className="mt-16 pt-16 border-t border-slate-200 scroll-mt-20 mb-10">
       <div className='text-center'>
-        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Frequently Asked Questions</h2>
-        <p className="text-slate-600 mb-10 w-full max-w-2xl mx-auto">
-        Everything you need to know about our products, ordering, and services.
-      </p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4 uppercase text-center lg:mb-10">Frequently Asked Questions</h2>
+       
       </div>
      
       <div className="grid grid-cols-1  gap-4 max-w-5xl mx-auto">

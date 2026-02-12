@@ -124,15 +124,15 @@ export default function ContactUs() {
     return (
       <section className="relative mt-16 overflow-hidden rounded-3xl mx-auto max-w-7xl">
         <img src={radiantBg} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-white/80" />
         <div className="relative z-10 max-w-2xl mx-auto text-center py-16 px-6">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-5 backdrop-blur-sm border border-emerald-400/30">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5 border border-emerald-200">
+            <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Thank you for reaching out!</h2>
-          <p className="text-white/70 mb-6">
+          <h2 className="text-2xl font-bold text-black mb-2">Thank you for reaching out!</h2>
+          <p className="text-black/60 mb-6">
             Your inquiry has been submitted successfully. Our team will get back to you within 24 hours.
           </p>
           <button
@@ -141,7 +141,7 @@ export default function ContactUs() {
               setSubmitted(false);
               setForm({ companyName: '', email: '', phone: '', product: '', grade: '', color: '', message: '' });
             }}
-            className="text-sm font-medium text-amber-300 hover:text-amber-200 transition-colors"
+            className="text-sm font-medium text-[#F57799] hover:text-[#FB9B8F] transition-colors"
           >
             Send another inquiry
           </button>
@@ -151,74 +151,68 @@ export default function ContactUs() {
   }
 
   const inputClass =
-    'w-full px-4 py-2.5 rounded-lg border border-white/15 bg-white/10 backdrop-blur-sm text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400/50 transition-colors placeholder:text-white/40';
-  const labelClass = 'block text-sm font-medium text-white/80 mb-1.5';
+    'w-full px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#F57799]/40 focus:border-[#F57799]/50 transition-colors placeholder:text-black/40';
+  const labelClass = 'block text-sm font-medium text-black/70 mb-1.5';
 
   return (
     <section
       id="contact"
-      className="relative overflow-hidden scroll-mt-20"
+      className="overflow-hidden scroll-mt-20 bg-white"
       style={{
         marginLeft: 'calc(-50vw + 50%)',
         marginRight: 'calc(-50vw + 50%)',
       }}
     >
-      {/* radiant gradient background */}
-      <img
-        src={radiantBg}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      <div className="absolute inset-0 bg-black/25" />
+    
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
+      <div className="px-4 py-10 lg:py-16 lg:px-0 scroll-mt-20 bg-gradient-to-b from-[#F57799]/10 to-[#F57799]/0">
+      <div className="max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
           {/* Left — info */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Get in touch</h2>
-            <p className="text-white/60 mb-8 leading-relaxed">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#F57799] mb-2">Get in touch</h2>
+            <p className="text-black/60 mb-8 leading-relaxed">
               Interested in our products or need a custom formulation? Fill out the form and our team will get back to you within 24 hours.
             </p>
 
             <div className="space-y-5">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-lg bg-[#FFF7CD]/50 border border-[#FDC3A1]/30 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-[#F57799]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">Email</p>
-                  <a href="mailto:contact@colorsmith.com" className="text-sm text-white/60 hover:text-amber-300 transition-colors">
+                  <p className="text-sm font-medium text-black">Email</p>
+                  <a href="mailto:contact@colorsmith.com" className="text-sm text-black/50 hover:text-[#F57799] transition-colors">
                     contact@colorsmith.com
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-lg bg-[#FFF7CD]/50 border border-[#FDC3A1]/30 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-[#F57799]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">Phone</p>
-                  <a href="tel:+919311029421" className="text-sm text-white/60 hover:text-amber-300 transition-colors">
+                  <p className="text-sm font-medium text-black">Phone</p>
+                  <a href="tel:+919311029421" className="text-sm text-black/50 hover:text-[#F57799] transition-colors">
                     +91 93110 29421
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-lg bg-[#FFF7CD]/50 border border-[#FDC3A1]/30 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-[#F57799]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">Response time</p>
-                  <p className="text-sm text-white/60">Within 24 hours on business days</p>
+                  <p className="text-sm font-medium text-black">Response time</p>
+                  <p className="text-sm text-black/50">Within 24 hours on business days</p>
                 </div>
               </div>
             </div>
@@ -228,7 +222,7 @@ export default function ContactUs() {
           <div className="lg:col-span-3">
             <form
               onSubmit={handleSubmit}
-              className="bg-white/[0.06] backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 space-y-5"
+              className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5"
             >
               {/* Row: Company + Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -286,11 +280,11 @@ export default function ContactUs() {
                   className={inputClass}
                   disabled={loadingProducts}
                 >
-                  <option value="" className="bg-neutral-900 text-white">
+                  <option value="" className="bg-white text-black">
                     {loadingProducts ? 'Loading products...' : 'Select a product'}
                   </option>
                   {productList.map((p) => (
-                    <option key={p._id} value={p._id} className="bg-neutral-900 text-white">{p.name}</option>
+                    <option key={p._id} value={p._id} className="bg-white text-black">{p.name}</option>
                   ))}
                 </select>
               </div>
@@ -307,11 +301,11 @@ export default function ContactUs() {
                     className={inputClass}
                     disabled={!form.product}
                   >
-                    <option value="" className="bg-neutral-900 text-white">
+                    <option value="" className="bg-white text-black">
                       {!form.product ? 'Select product first' : gradeList.length === 0 ? 'No grades available' : 'Select a grade'}
                     </option>
                     {gradeList.map((g) => (
-                      <option key={g._id} value={g._id} className="bg-neutral-900 text-white">{g.name}</option>
+                      <option key={g._id} value={g._id} className="bg-white text-black">{g.name}</option>
                     ))}
                   </select>
                 </div>
@@ -325,11 +319,11 @@ export default function ContactUs() {
                     className={inputClass}
                     disabled={!form.product}
                   >
-                    <option value="" className="bg-neutral-900 text-white">
+                    <option value="" className="bg-white text-black">
                       {!form.product ? 'Select product first' : colorList.length === 0 ? 'No colors available' : 'Select a color'}
                     </option>
                     {colorList.map((c) => (
-                      <option key={c._id} value={c._id} className="bg-neutral-900 text-white">{c.name}</option>
+                      <option key={c._id} value={c._id} className="bg-white text-black">{c.name}</option>
                     ))}
                   </select>
                 </div>
@@ -351,7 +345,7 @@ export default function ContactUs() {
               </div>
 
               {error && (
-                <div className="px-4 py-3 rounded-lg bg-red-500/20 text-red-200 border border-red-400/30 text-sm backdrop-blur-sm">
+                <div className="px-4 py-3 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm">
                   {error}
                 </div>
               )}
@@ -359,18 +353,20 @@ export default function ContactUs() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full px-6 py-3 rounded-xl bg-amber-400 text-neutral-900 font-semibold hover:bg-amber-300 transition-all shadow-lg shadow-amber-400/20 hover:shadow-amber-400/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3 rounded-xl bg-[#F57799] text-white font-semibold hover:bg-[#FB9B8F] transition-all shadow-lg shadow-[#F57799]/20 hover:shadow-[#F57799]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Sending...' : 'Send inquiry'}
               </button>
 
-              <p className="text-xs text-white/30 text-center">
+              <p className="text-xs text-black/40 text-center">
                 By submitting, you agree to our{' '}
-                <a href="/policies/privacy" className="underline hover:text-white/50">privacy policy</a>.
+                <a href="/policies/privacy" className="underline hover:text-[#F57799]">privacy policy</a>.
               </p>
             </form>
           </div>
         </div>
+      </div>
+      
       </div>
     </section>
   );
