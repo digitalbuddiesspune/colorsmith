@@ -93,35 +93,34 @@ export default function BottomNav() {
             className={({ isActive }) => `${base} ${isActive ? active : inactive}`}
           >
             <svg
-  className="w-6 h-6 text-gray-500"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth={1.8}
-  viewBox="0 0 24 24"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M12 3a9 9 0 100 18h1.5a1.5 1.5 0 000-3H12a6 6 0 110-12 6 6 0 016 6v1.5a1.5 1.5 0 003 0V12a9 9 0 00-9-9z"
-  />
-  <circle cx="7.5" cy="10.5" r="1" fill="currentColor" />
-  <circle cx="10.5" cy="7.5" r="1" fill="currentColor" />
-  <circle cx="15" cy="8.5" r="1" fill="currentColor" />
-  <circle cx="16.5" cy="13" r="1" fill="currentColor" />
-</svg>
+              className="w-6 h-6 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 3a9 9 0 100 18h1.5a1.5 1.5 0 000-3H12a6 6 0 110-12 6 6 0 016 6v1.5a1.5 1.5 0 003 0V12a9 9 0 00-9-9z"
+              />
+              <circle cx="7.5" cy="10.5" r="1" fill="currentColor" />
+              <circle cx="10.5" cy="7.5" r="1" fill="currentColor" />
+              <circle cx="15" cy="8.5" r="1" fill="currentColor" />
+              <circle cx="16.5" cy="13" r="1" fill="currentColor" />
+            </svg>
 
-            <span>Color Tools</span>
+            <span>Tools</span>
           </NavLink>
 
           {/* Account */}
           <button
             type="button"
             onClick={handleAccountClick}
-            className={`${base} ${
-              ['/account', '/orders', '/my-color-sets'].some((p) => location.pathname.startsWith(p)) && user
+            className={`${base} ${['/account', '/orders', '/my-color-sets'].some((p) => location.pathname.startsWith(p)) && user
                 ? active
                 : inactive
-            }`}
+              }`}
           >
             {user ? (
               <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs font-semibold">
