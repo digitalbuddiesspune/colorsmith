@@ -138,9 +138,9 @@ export default function ProductDetail() {
       {/* ---- hero row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 mb-12">
         {/* product image */}
-        <div className="rounded-2xl border border-neutral-200 flex items-center justify-center  aspect-square lg:aspect-auto lg:min-h-[420px]">
+        <div className="rounded-2xl bg-white border border-neutral-200 flex items-center justify-center  aspect-square lg:aspect-auto lg:min-h-[420px]">
           {product.image ? (
-            <img src={product.image} alt={product.name} className="max-h-[380px] w-auto object-contain" />
+            <img src={product.image} alt={product.name} className="max-h-[380px] w-auto object-contain rounded-2xl" />
           ) : (
             <div className="text-neutral-300">
               <svg className="w-24 h-24" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>

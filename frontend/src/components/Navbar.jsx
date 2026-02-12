@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import CategoriesDropdown from "./CategoriesDropdown";
+import  Logo  from "../assets/logo.png";
 import AuthModal from "./AuthModal";
 
 export default function Navbar() {
@@ -79,19 +80,15 @@ export default function Navbar() {
     <>
       {/* ⭐ UPDATED HEADER */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md shadow-sm transform transition-transform duration-300 ${
+        className={` bg-black fixed top-0 left-0 w-full z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md shadow-sm transform transition-transform duration-300 ${
           showNavbar ? "translate-y-0" : "-translate-y-full"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-0">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-semibold tracking-tight text-slate-900">
-                Color Smith
-              </span>
-              <span className="text-slate-500 text-sm hidden sm:inline">
-                B2B Cosmetics
-              </span>
+             <img src={Logo} alt="Color Smith" className="h-10" />
+              
             </Link>
 
             <nav className="hidden sm:flex items-center gap-1">
@@ -118,7 +115,7 @@ export default function Navbar() {
               </NavLink>
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center lg:gap-3 gap-1">
               <Link
                 to="/cart"
                 className="relative p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -139,7 +136,11 @@ export default function Navbar() {
                     }
                     className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100"
                   >
-                    Account
+                    <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+                      <span className="text-slate-100 text-sm font-medium">
+                        {user.name.charAt(0)}
+                      </span>
+                    </div>
                   </button>
 
                   {accountDropdownOpen && (

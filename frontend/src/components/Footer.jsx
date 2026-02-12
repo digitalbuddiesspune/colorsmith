@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import rosePetalsBg from '../assets/rose-petals.svg';
+
+import  Logo  from "../assets/logo.png";
 
 const policies = [
   { label: 'Privacy Policy', path: '/policies/privacy' },
@@ -22,9 +23,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-semibold text-white uppercase tracking-wider mb-4">
-              Color Smith
-            </h3>
+          <img src={Logo} alt="Color Smith" className="h-16 mb-4" />
             {/* <img src={logoImg} alt="Color Smith" className="w-20 h-20" /> */}
             
             <p className="text-white/70 text-sm">
