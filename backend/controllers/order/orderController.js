@@ -22,19 +22,34 @@ const getRazorpay = () => {
 // Create Razorpay order (for online payment)
 export const createRazorpayOrder = async (req, res) => {
   try {
+    // Fail fast with clear message if credentials missing (common in production)
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.error('Razorpay: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET not set');
+      return res.status(500).json({
+        success: false,
+        message: 'Payment gateway not configured. Please contact support.',
+      });
+    }
+
     const { amount } = req.body;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ success: false, message: 'Invalid amount' });
     }
 
+    const amountPaise = Math.round(Number(amount) * 100);
+    if (amountPaise < 100) {
+      return res.status(400).json({ success: false, message: 'Amount must be at least ₹1' });
+    }
+
     const options = {
-      amount: Math.round(amount * 100), // Razorpay expects amount in paise
+      amount: amountPaise, // Razorpay expects amount in paise
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
     };
 
-    const order = await getRazorpay().orders.create(options);
+    const razorpay = getRazorpay();
+    const order = await razorpay.orders.create(options);
 
     return res.status(200).json({
       success: true,
@@ -44,8 +59,18 @@ export const createRazorpayOrder = async (req, res) => {
       keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    console.error('Razorpay order creation error:', error);
-    return res.status(500).json({ success: false, message: error.message || 'Failed to create payment order' });
+    const msg = error.message || error.error?.description || 'Failed to create payment order';
+    const status = error.statusCode || error.status || 500;
+    console.error('Razorpay order creation error:', {
+      message: msg,
+      code: error.code,
+      statusCode: error.statusCode,
+      full: error,
+    });
+    return res.status(status >= 400 && status < 600 ? status : 500).json({
+      success: false,
+      message: msg,
+    });
   }
 };
 
