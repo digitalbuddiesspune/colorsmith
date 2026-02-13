@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { scrollToTop } from '../utility/scrollToTop';
 
 export default function Cart() {
   const { cart, loading, itemCount, subtotal, sgstAmount, cgstAmount, gstAmount, grandTotal, removeItem, updateQuantity, clearCart } = useCart();
@@ -19,6 +20,7 @@ export default function Cart() {
         <p className="text-slate-600 mb-6">Add products from the catalog to get started.</p>
         <Link
           to="/catalog"
+          onClick={scrollToTop}
           className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
         >
           Browse catalog
@@ -63,7 +65,7 @@ export default function Cart() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <Link to={`/product/${item.productId}`} className="font-medium text-slate-900 hover:text-amber-600">
+                <Link to={`/product/${item.productId}`} onClick={scrollToTop} className="font-medium text-slate-900 hover:text-amber-600">
                   {item.productName}
                 </Link>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
@@ -133,7 +135,7 @@ export default function Cart() {
 
       <div className="mt-8 p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
         <div className="flex flex-wrap justify-between items-start gap-4">
-          <Link to="/catalog" className="text-slate-600 hover:text-slate-900 text-sm font-medium">
+          <Link to="/catalog" onClick={scrollToTop} className="text-slate-600 hover:text-slate-900 text-sm font-medium">
             ← Continue shopping
           </Link>
           <div className="text-right space-y-1">
@@ -172,6 +174,7 @@ export default function Cart() {
         <div className="flex justify-end mt-4">
           <Link
             to="/checkout"
+            onClick={scrollToTop}
             className="px-5 py-2.5 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
           >
             Checkout

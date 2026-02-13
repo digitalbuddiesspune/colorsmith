@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import CategoriesDropdown from "./CategoriesDropdown";
 import  Logo  from "../assets/logo.png";
 import AuthModal from "./AuthModal";
-import { scrollToTop } from "../utility/scrollToTop";
+import { ScrollToTopNavLink } from "../utility/scrollToTop";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -107,13 +107,13 @@ export default function Navbar() {
                 Categories
               </button>
 
-              <NavLink to="/catalog" className={navLinkClass} onClick={scrollToTop}>
+              <ScrollToTopNavLink to="/catalog" className={navLinkClass}>
                 Catalog
-              </NavLink>
+              </ScrollToTopNavLink>
 
-              <NavLink to="/color-tools" className={navLinkClass} onClick={scrollToTop}>
+              <ScrollToTopNavLink to="/color-tools" className={navLinkClass}>
                 Color Tools
-              </NavLink>
+              </ScrollToTopNavLink>
             </nav>
 
             <div className="flex items-center lg:gap-3 gap-1">

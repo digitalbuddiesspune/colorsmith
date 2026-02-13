@@ -1,6 +1,6 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { scrollToTop } from '../../utility/scrollToTop';
+import { ScrollToTopNavLink } from '../../utility/scrollToTop';
 import Logo from '../../assets/logo.png';
 
 const navItems = [
@@ -93,11 +93,10 @@ export default function AdminSidebar() {
       </div>
       <nav className="flex-1 p-3 space-y-0.5">
         {navItems.map((item) => (
-          <NavLink
+          <ScrollToTopNavLink
             key={item.to}
             to={item.to}
             end={item.end}
-            onClick={scrollToTop}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
@@ -108,7 +107,7 @@ export default function AdminSidebar() {
           >
             <Icon name={item.icon} />
             {item.label}
-          </NavLink>
+          </ScrollToTopNavLink>
         ))}
       </nav>
       <div className="p-3 border-t border-slate-700">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../api/client';
+import { scrollToTop } from '../utility/scrollToTop';
 
 export default function Account() {
   const { user, updateUser, logout } = useAuth();
@@ -312,6 +313,7 @@ export default function Account() {
           <div className="space-y-1">
             <Link
               to="/orders"
+              onClick={scrollToTop}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             >
               <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -323,6 +325,7 @@ export default function Account() {
            
             <Link
               to="/cart"
+              onClick={scrollToTop}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             >
               <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">

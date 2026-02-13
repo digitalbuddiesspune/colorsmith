@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import rosePetalsBg from '../assets/radiant-gradient.svg';
+import { scrollToTop } from '../utility/scrollToTop';
 
 const steps = [
   {
@@ -84,7 +85,8 @@ export default function StartBusiness() {
                 </p>
                 <Link
                   to={step.link.to}
-                    className="inline-flex items-center gap-1.5 text-[#3c3c3c] text-sm font-medium hover:text-[#3c3c3c] transition-colors"
+                  onClick={scrollToTop}
+                  className="inline-flex items-center gap-1.5 text-[#3c3c3c] text-sm font-medium hover:text-[#3c3c3c] transition-colors"
                 >
                   {step.link.label}
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -101,7 +103,8 @@ export default function StartBusiness() {
         {/* CTA button */}
         <Link
           to="/catalog"
-            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-[#3c3c3c] text-white font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:-translate-y-0.5"
+          onClick={scrollToTop}
+          className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-[#3c3c3c] text-white font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:-translate-y-0.5"
         >
           Browse Catalog
         </Link>
