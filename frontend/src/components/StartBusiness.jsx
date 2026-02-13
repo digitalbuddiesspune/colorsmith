@@ -58,10 +58,7 @@ export default function StartBusiness() {
 
       {/* scrolling content */}
       <div className="max-w-7xl mx-auto px-4  py-10">
-        {/* header */}
-        <div className="mb-5 uppercase text-center">
-          <h2 className="text-3xl font-bold leading-[1.1] mb-10">Start your cosmetics business in 4 steps</h2>
-        </div>
+       
 
         {/* steps */}
         <div className="space-y-4 mb-14 rounded-lg">

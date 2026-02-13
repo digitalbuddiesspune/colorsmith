@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { scrollToTop } from '../utility/scrollToTop';
 
 const policies = {
   privacy: {
@@ -201,9 +202,9 @@ export default function Policies() {
         )}
       </div>
       <div className="mt-10 pt-6 border-t border-slate-200">
-        <Link to="/policies/privacy" className="text-amber-600 hover:underline text-sm mr-4">Privacy Policy</Link>
-        <Link to="/policies/terms" className="text-amber-600 hover:underline text-sm mr-4">Terms of Use</Link>
-        <Link to="/policies/shipping" className="text-amber-600 hover:underline text-sm">Shipping & Returns</Link>
+        <Link to="/policies/privacy" onClick={scrollToTop} className="text-amber-600 hover:underline text-sm mr-4">Privacy Policy</Link>
+        <Link to="/policies/terms" onClick={scrollToTop} className="text-amber-600 hover:underline text-sm mr-4">Terms of Use</Link>
+        <Link to="/policies/shipping" onClick={scrollToTop} className="text-amber-600 hover:underline text-sm">Shipping & Returns</Link>
       </div>
     </div>
   );

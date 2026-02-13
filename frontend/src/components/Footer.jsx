@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-
-import  Logo  from "../assets/logo.png";
+import { scrollToTop } from '../utility/scrollToTop';
+import Logo from '../assets/logo.png';
 
 const policies = [
   { label: 'Privacy Policy', path: '/policies/privacy' },
@@ -40,6 +40,7 @@ export default function Footer() {
                 <li key={p.path}>
                   <Link
                     to={p.path}
+                    onClick={scrollToTop}
                     className="text-white/70 hover:text-amber-300 text-sm transition-colors"
                   >
                     {p.label}

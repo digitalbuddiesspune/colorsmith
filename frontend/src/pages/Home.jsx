@@ -49,12 +49,13 @@ export default function Home() {
       <section id="categories" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
         <CategoriesList />
       </section>
-      <section id="start-business" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
-        <StartBusiness />
-      </section>
       <section id="start-business-mid" className="scroll-mt-20">
         <StartBusinessMid />
       </section>
+      <section id="start-business" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
+        <StartBusiness />
+      </section>
+     
       
       <section id="why-color-smith" className="max-w-7xl mx-auto mt-16 pt-16 border-t border-slate-200/60 scroll-mt-20 px-4 lg:px-0">
         <WhyColorSmith />

@@ -282,11 +282,12 @@ function AIColorMatch({ allColors, loading }) {
 /* ═══════════════════════════════════════════
    2. COLOR SUGGESTION
    ═══════════════════════════════════════════ */
+const WEB3FORMS_ACCESS_KEY = 'd3adc8c3-08fc-4141-b63a-133586243760';
+
 function ColorSuggestion({ allProducts }) {
   const { user } = useAuth();
   const [form, setForm] = useState({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState('');
   const [mySuggestions, setMySuggestions] = useState([]);
   const [loadingMine, setLoadingMine] = useState(false);
 
@@ -297,18 +298,34 @@ function ColorSuggestion({ allProducts }) {
       .then((res) => setMySuggestions(res.data?.data ?? []))
       .catch(() => {})
       .finally(() => setLoadingMine(false));
-  }, [user, submitted]);
+  }, [user, result]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (event) => {
+    event.preventDefault();
     if (!form.name || !form.hexCode) return;
-    setSubmitting(true);
+    setResult('Sending....');
+    const formData = new FormData();
+    formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+    formData.append('name', form.name);
+    formData.append('hexCode', form.hexCode);
+    formData.append('product', form.product);
+    formData.append('notes', form.notes);
+
     try {
-      await colorSuggestions.create(form);
-      setSubmitted(true);
-      setForm({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
-    } catch { }
-    finally { setSubmitting(false); }
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.success) {
+        setResult('Form Submitted Successfully');
+        setForm({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
+      } else {
+        setResult('Error');
+      }
+    } catch {
+      setResult('Error');
+    }
   };
 
   if (!user) {
@@ -330,14 +347,20 @@ function ColorSuggestion({ allProducts }) {
           <h3 className="text-lg font-semibold text-neutral-900 mb-1">Suggest a new color</h3>
           <p className="text-neutral-500 text-sm mb-6">Can't find the shade you need? Suggest it and our team will review it.</p>
 
-          {submitted && (
+          {result === 'Form Submitted Successfully' && (
             <div className="mb-6 px-4 py-3 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm">
               Color suggestion submitted! Our team will review it shortly.
-              <button onClick={() => setSubmitted(false)} className="ml-2 underline">Submit another</button>
+              <button type="button" onClick={() => setResult('')} className="ml-2 underline">Submit another</button>
+            </div>
+          )}
+          {result === 'Error' && (
+            <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 text-red-700 border border-red-200 text-sm">
+              Something went wrong. Please try again.
+              <button type="button" onClick={() => setResult('')} className="ml-2 underline">Dismiss</button>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={onSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-1.5">Color name *</label>
@@ -372,8 +395,8 @@ function ColorSuggestion({ allProducts }) {
               </div>
             </div>
 
-            <button type="submit" disabled={submitting} className="px-6 py-3 rounded-xl bg-neutral-900 text-white font-semibold text-sm hover:bg-neutral-800 transition-all shadow-lg disabled:opacity-50">
-              {submitting ? 'Submitting…' : 'Submit suggestion'}
+            <button type="submit" disabled={result === 'Sending....'} className="px-6 py-3 rounded-xl bg-neutral-900 text-white font-semibold text-sm hover:bg-neutral-800 transition-all shadow-lg disabled:opacity-50">
+              {result === 'Sending....' ? 'Sending....' : 'Submit suggestion'}
             </button>
           </form>
         </div>

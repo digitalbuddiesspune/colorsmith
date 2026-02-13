@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 // Decorative SVG icons for background (makeup brush, dropper, sparkle)
@@ -25,10 +25,22 @@ const SparkleIcon = ({ className = '' }) => (
   </svg>
 );
 
-const startBusinessMidImage =
-  'https://res.cloudinary.com/dygteqnrv/image/upload/v1770957379/mid-banner_plu7nm.jpg';
+const startBusinessMidImages = [
+  'https://res.cloudinary.com/dygteqnrv/image/upload/v1770957379/mid-banner_plu7nm.jpg',
+  'https://res.cloudinary.com/dygteqnrv/image/upload/v1770706065/Nail_j13dku.jpg',
+  'https://res.cloudinary.com/dygteqnrv/image/upload/v1770457617/makeup-products-color-background-top-view.jpg_1_ziaf6n.jpg',
+];
 
 export default function StartBusinessMid() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % startBusinessMidImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-red-50 via-red-100/80 to-rose-200/70 min-h-[520px] lg:min-h-[560px]">
       {/* Background decorative icons — makeup brush, dropper, sparkle */}
@@ -63,14 +75,33 @@ export default function StartBusinessMid() {
             </Link>
           </div>
 
-          {/* Image side */}
+          {/* Image side — carousel */}
           <div className="order-1 lg:order-2">
             <div className="relative rounded-2xl overflow-hidden shadow-xl shadow-slate-200/80 ring-1 ring-slate-200/60 aspect-[4/3] lg:aspect-[5/4] max-h-[320px] lg:max-h-[400px]">
-              <img
-                src={startBusinessMidImage}
-                alt="Start your cosmetics business with Colorsmith"
-                className="w-full h-full object-cover"
-              />
+              {startBusinessMidImages.map((url, index) => (
+                <img
+                  key={url}
+                  src={url}
+                  alt={`Start your cosmetics business with Colorsmith ${index + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                    index === currentImageIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+                />
+              ))}
+              {/* Dots */}
+              <div className="absolute bottom-3 left-0 right-0 z-20 flex justify-center gap-2">
+                {startBusinessMidImages.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      index === currentImageIndex ? 'w-6 bg-white' : 'w-2 bg-white/60 hover:bg-white/80'
+                    }`}
+                    aria-label={`Go to image ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>

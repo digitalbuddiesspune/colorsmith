@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { products as productsApi, grades as gradesApi, colors as colorsApi } from '../api/client';
+import { scrollToTop } from '../utility/scrollToTop';
 import radiantBg from '../assets/radiant-gradient.svg';
 
 export default function ContactUs() {
@@ -360,7 +362,7 @@ export default function ContactUs() {
 
               <p className="text-xs text-black/40 text-center">
                 By submitting, you agree to our{' '}
-                <a href="/policies/privacy" className="underline hover:text-[#F57799]">privacy policy</a>.
+                <Link to="/policies/privacy" onClick={scrollToTop} className="underline hover:text-[#F57799]">privacy policy</Link>.
               </p>
             </form>
           </div>
