@@ -26,7 +26,7 @@ const SparkleIcon = ({ className = '' }) => (
 );
 
 const startBusinessMidImages = [
-  'https://res.cloudinary.com/dygteqnrv/image/upload/v1770957379/mid-banner_plu7nm.jpg',
+  
   'https://res.cloudinary.com/dygteqnrv/image/upload/v1770706065/Nail_j13dku.jpg',
   'https://res.cloudinary.com/dygteqnrv/image/upload/v1770457617/makeup-products-color-background-top-view.jpg_1_ziaf6n.jpg',
 ];
@@ -77,7 +77,7 @@ export default function StartBusinessMid() {
 
           {/* Image side — carousel */}
           <div className="order-1 lg:order-2">
-            <div className="relative rounded-2xl overflow-hidden shadow-xl shadow-slate-200/80 ring-1 ring-slate-200/60 aspect-[4/3] lg:aspect-[5/4] max-h-[320px] lg:max-h-[400px]">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl shadow aspect-[4/3] lg:aspect-[5/4] max-h-[320px] lg:max-h-[400px]">
               {startBusinessMidImages.map((url, index) => (
                 <img
                   key={url}
