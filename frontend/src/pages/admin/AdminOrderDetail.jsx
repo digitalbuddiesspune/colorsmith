@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { orders as ordersApi } from '../../api/client';
 import { formatOrderId } from '../../utility/formatedOrderId';
+import { generateInvoicePDF } from '../../utility/invoiceGenerator';
 
 // Order Status Badge Component
 function StatusBadge({ status, type = 'order' }) {
@@ -139,6 +140,7 @@ export default function AdminOrderDetail() {
   const [paymentStatus, setPaymentStatus] = useState('');
   const [updating, setUpdating] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [invoiceDownloading, setInvoiceDownloading] = useState(false);
 
   useEffect(() => {
     fetchOrder();
@@ -185,6 +187,19 @@ export default function AdminOrderDetail() {
       setTimeout(() => setSaveMessage(''), 3000);
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    setInvoiceDownloading(true);
+    try {
+      await generateInvoicePDF(order);
+    } catch (err) {
+      console.error('Failed to generate invoice:', err);
+      setSaveMessage('Failed to download invoice');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } finally {
+      setInvoiceDownloading(false);
     }
   };
 
@@ -268,13 +283,14 @@ export default function AdminOrderDetail() {
             <p className="text-xs text-slate-500 uppercase tracking-wider">Order ID</p>
             <p className="text-2xl font-bold text-slate-900 mt-1">{formatOrderId(order.orderNumber || order._id)}</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-end gap-4">
             <div>
               <label className="text-xs text-slate-500 uppercase tracking-wider block mb-1.5">Order Status</label>
               <select
                 value={orderStatus}
                 onChange={(e) => handleOrderStatusChange(e.target.value)}
-                disabled={updating}
+                disabled={updating || orderStatus === 'cancelled' || orderStatus === 'delivered'}
+                title={orderStatus === 'cancelled' || orderStatus === 'delivered' ? 'Status cannot be changed' : undefined}
                 className="px-4 py-2 border border-amber-200 rounded-lg text-sm bg-amber-50 text-amber-800 font-medium min-w-[140px] disabled:opacity-50"
               >
                 <option value="pending">Pending</option>
@@ -298,6 +314,31 @@ export default function AdminOrderDetail() {
                 <option value="failed">Failed</option>
                 <option value="refunded">Refunded</option>
               </select>
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={handleDownloadInvoice}
+                disabled={invoiceDownloading}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {invoiceDownloading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Downloading…
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download invoice
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

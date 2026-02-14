@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import { orders as ordersApi } from '../../api/client';
 import { formatOrderId } from '../../utility/formatedOrderId';
 
@@ -40,6 +41,7 @@ export default function AdminOrders() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, pages: 1 });
   const [statusFilter, setStatusFilter] = useState('');
+  const [exportLoading, setExportLoading] = useState(false);
   const limit = 10;
 
   const fetchOrders = async () => {
@@ -78,6 +80,46 @@ export default function AdminOrders() {
     navigate(`/admin/orders/${orderId}`);
   };
 
+  const handleDownloadXLS = async () => {
+    setExportLoading(true);
+    try {
+      const params = { page: 1, limit: 10000 };
+      if (statusFilter) params.status = statusFilter;
+      const res = await ordersApi.adminList(params);
+      const list = res.data.orders || [];
+      const formatDateForExport = (date) => {
+        if (!date) return '';
+        return new Date(date).toLocaleString('en-IN', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        });
+      };
+      const rows = list.map((order) => ({
+        'Order #': formatOrderId(order.orderNumber || order._id),
+        Date: formatDateForExport(order.createdAt),
+        'Customer Name': order.user?.name || order.shippingAddress?.name || 'N/A',
+        Phone: order.shippingAddress?.phone || '',
+        Email: order.user?.email || '',
+        Address: [order.shippingAddress?.address, order.shippingAddress?.city, order.shippingAddress?.state, order.shippingAddress?.zip].filter(Boolean).join(', '),
+        'Items Count': order.items?.length || 0,
+        Amount: Number(order.grandTotal || 0),
+        'Order Status': order.orderStatus || '',
+        'Payment Status': order.paymentStatus === 'pending' ? 'Unpaid' : order.paymentStatus || '',
+        'Payment Method': order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online',
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+      const filename = `orders_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(wb, filename);
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Failed to download orders. Please try again.');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   return (
     <div>
       {/* Header */}
@@ -95,10 +137,35 @@ export default function AdminOrders() {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-slate-900">Orders</h1>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-slate-600">Total: <span className="font-medium text-slate-900">{pagination.total}</span></span>
-          <span className="text-slate-600">Pending: <span className="font-medium text-amber-600">{pendingCount}</span></span>
-          <span className="text-slate-600">Delivered: <span className="font-medium text-emerald-600">{deliveredCount}</span></span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-slate-600">Total: <span className="font-medium text-slate-900">{pagination.total}</span></span>
+            <span className="text-slate-600">Pending: <span className="font-medium text-amber-600">{pendingCount}</span></span>
+            <span className="text-slate-600">Delivered: <span className="font-medium text-emerald-600">{deliveredCount}</span></span>
+          </div>
+          <button
+            type="button"
+            onClick={handleDownloadXLS}
+            disabled={exportLoading}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {exportLoading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Exporting…
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download XLS
+              </>
+            )}
+          </button>
         </div>
       </div>
 
