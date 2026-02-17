@@ -10,6 +10,10 @@ const client = axios.create({
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('colorsmith_admin_token') || localStorage.getItem('colorsmith_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Let the browser set Content-Type (with boundary) for FormData so file uploads work
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
 
@@ -114,6 +118,13 @@ export const colorSuggestions = {
   mine: () => client.get('/color-suggestions/mine'),
   adminList: () => client.get('/color-suggestions'),
   adminUpdate: (id, data) => client.put(`/color-suggestions/${id}`, data),
+};
+
+/** Upload image file to Cloudinary via backend. Returns { data: { url } }. */
+export const uploadImage = (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  return client.post('/upload-image', formData);
 };
 
 export const orders = {

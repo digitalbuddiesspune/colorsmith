@@ -12,6 +12,7 @@ import cartRouter from './routes/user/cartRouter.js';
 import addressRouter from './routes/user/addressRouter.js';
 import orderRouter from './routes/order/orderRouter.js';
 import colorSuggestionRouter from './routes/color/colorSuggestionRoute.js';
+import uploadRouter from './routes/uploadRoute.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/v1/cart', cartRouter);
 app.use('/api/v1/address', addressRouter);
 app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1', colorSuggestionRouter);
+app.use('/api/v1', uploadRouter);
 app.get('/', (req, res) => {
   res.send('Color Smith API is ready');
 });

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { categories, products, grades, colors } from '../../api/client';
+import { categories, products, grades, colors, uploadImage } from '../../api/client';
 
 function AddAvailabilityRow({ grades: gradesList, colors: colorsList, onAdd }) {
   const [gradeId, setGradeId] = useState('');
@@ -72,7 +72,9 @@ export default function AdminProductForm() {
   const [colorForm, setColorForm] = useState({ name: '', hexCode: '#000000' });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [createdId, setCreatedId] = useState(null);
+  const imageFileInputRef = useRef(null);
 
   useEffect(() => {
     categories.list().then((res) => {
@@ -229,7 +231,7 @@ export default function AdminProductForm() {
         colors: productDetail?.colors ?? [],
         minimumOrderQuantity: moq,
       });
-      setProductDetail((prev) => prev ? { ...prev, ...form } : null);
+      navigate('/admin/products');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update');
     } finally {
@@ -375,14 +377,63 @@ export default function AdminProductForm() {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm text-slate-700 mb-1">Image URL *</label>
-              <input
-                type="url"
-                value={form.image}
-                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                className="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 text-slate-900"
-                placeholder="https://..."
-              />
+              <label className="block text-sm text-slate-700 mb-1">Image *</label>
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    ref={imageFileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    className="sr-only"
+                    disabled={imageUploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setImageUploading(true);
+                      setError('');
+                      try {
+                        const res = await uploadImage(file);
+                        const url = res.data?.url;
+                        if (url) setForm((f) => ({ ...f, image: url }));
+                      } catch (err) {
+                        setError(err.response?.data?.message || 'Image upload failed');
+                      } finally {
+                        setImageUploading(false);
+                        if (imageFileInputRef.current) imageFileInputRef.current.value = '';
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    disabled={imageUploading}
+                    onClick={() => imageFileInputRef.current?.click()}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 disabled:opacity-50"
+                  >
+                    {imageUploading ? 'Uploading…' : 'Upload from device'}
+                  </button>
+                  {form.image && (
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, image: '' }))}
+                      className="text-xs text-slate-500 hover:text-red-600 underline"
+                    >
+                      Clear image
+                    </button>
+                  )}
+                  <span className="text-xs text-slate-500">JPEG, PNG, GIF or WebP (max 5 MB)</span>
+                </div>
+                <input
+                  type="url"
+                  value={form.image}
+                  onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                  className="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 text-slate-900"
+                  placeholder="Or paste image URL"
+                />
+                {form.image && (
+                  <img src={form.image} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-slate-200" />
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-sm text-slate-700 mb-1">Minimum order quantity *</label>

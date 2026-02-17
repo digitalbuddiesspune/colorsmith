@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { categories } from '../../api/client';
+import { categories, uploadImage } from '../../api/client';
 
 export default function AdminCategoryForm() {
   const navigate = useNavigate();
@@ -9,6 +9,7 @@ export default function AdminCategoryForm() {
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
@@ -121,15 +122,48 @@ export default function AdminCategoryForm() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Image URL
+              Image
             </label>
-            <input
-              type="url"
-              value={form.image}
-              onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              placeholder="https://..."
-            />
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 cursor-pointer disabled:opacity-50">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    className="sr-only"
+                    disabled={imageUploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setImageUploading(true);
+                      setError('');
+                      try {
+                        const res = await uploadImage(file);
+                        const url = res.data?.url;
+                        if (url) setForm((f) => ({ ...f, image: url }));
+                      } catch (err) {
+                        setError(err.response?.data?.message || 'Image upload failed');
+                      } finally {
+                        setImageUploading(false);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  {imageUploading ? 'Uploading…' : 'Upload from device'}
+                </label>
+                <span className="text-xs text-slate-500">JPEG, PNG, GIF or WebP (max 5 MB)</span>
+              </div>
+              <input
+                type="url"
+                value={form.image}
+                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                placeholder="Or paste image URL"
+              />
+              {form.image && (
+                <img src={form.image} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-slate-200" />
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <input
