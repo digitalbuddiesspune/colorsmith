@@ -63,20 +63,21 @@ export default function WhyColorSmith() {
     <section id="why-color-smith" className="scroll-mt-20">
        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10 uppercase text-center">Why Color Smith</h2>
       
-      <video src={video} autoPlay loop muted playsInline className="h-96 w-full object-cover rounded-lg" />
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 px-4 lg:px-0 mb-10">
         {points.map((item, i) => (
           <div
             key={i}
             className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow transition-shadow"
           >
           
-            <h3 className="mt-4 text-lg font-semibold text-golde uppercase">{item.title}</h3>
+            <h3 className="mt-4 text-lg font-semibold font-sans uppercase">{item.title}</h3>
             <p className="mt-2 text-slate-600 text-sm">{item.description}</p>
           </div>
         ))}
       </div>
+      <video src={video} autoPlay loop muted playsInline className="w-full lg:max-h-[500px] object-cover mx-auto" />
+
     </section>
   );
 }

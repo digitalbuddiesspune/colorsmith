@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "DM Sans", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
   --font-body: "DM Sans", system-ui, sans-serif;
   --color-brand-50: #fdf4f3;
   --color-brand-100: #fbe8e6;
@@ -22,5 +22,14 @@
   }
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
   }
 }

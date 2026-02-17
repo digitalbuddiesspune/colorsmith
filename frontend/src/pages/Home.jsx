@@ -6,7 +6,7 @@ import CategoriesList from './CategoriesList';
 import HeroSection from '../components/HeroSection';
 import FAQ from '../components/FAQ';
 import ContactUs from '../components/ContactUs';
-import StartBusiness from '../components/StartBusiness';
+
 import StartBusinessMid from './StartBusinessMid';
 
 export default function Home() {
@@ -52,12 +52,10 @@ export default function Home() {
       <section id="start-business-mid" className="scroll-mt-20">
         <StartBusinessMid />
       </section>
-      <section id="start-business" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
-        <StartBusiness />
-      </section>
+     
      
       
-      <section id="why-color-smith" className="max-w-7xl mx-auto mt-16 pt-16 border-t border-slate-200/60 scroll-mt-20 px-4 lg:px-0">
+      <section id="why-color-smith" className=" mt-16 pt-16 border-t border-slate-200/60 scroll-mt-20 lg:px-0">
         <WhyColorSmith />
       </section>
 
