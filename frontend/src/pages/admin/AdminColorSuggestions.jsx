@@ -22,11 +22,20 @@ export default function AdminColorSuggestions() {
 
   useEffect(() => { fetchList(); }, []);
 
-  const handleAction = async (id, status) => {
+  const handleAction = async (id, status, adminNotes = undefined) => {
     try {
-      await colorSuggestions.adminUpdate(id, { status });
+      await colorSuggestions.adminUpdate(id, { status, adminNotes });
       fetchList();
     } catch { }
+  };
+
+  const handleApprove = (s) => {
+    const note = window.prompt('Optional note for this suggestion:');
+    handleAction(s._id, 'approved', note !== null ? note.trim() || undefined : undefined);
+  };
+  const handleReject = (s) => {
+    const note = window.prompt('Optional reason for rejection:');
+    handleAction(s._id, 'rejected', note !== null ? note.trim() || undefined : undefined);
   };
 
   const filtered = filter === 'all' ? list : list.filter((s) => s.status === filter);
@@ -80,14 +89,17 @@ export default function AdminColorSuggestions() {
                     <span className={`text-xs font-semibold px-2 py-1 rounded-full capitalize ${statusColors[s.status]}`}>{s.status}</span>
                   </td>
                   <td className="px-4 py-3">
-                    {s.status === 'pending' ? (
-                      <div className="flex gap-1.5">
-                        <button onClick={() => handleAction(s._id, 'approved')} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors">Approve</button>
-                        <button onClick={() => handleAction(s._id, 'rejected')} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition-colors">Reject</button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-400">—</span>
-                    )}
+                    <div className="flex flex-wrap gap-1.5">
+                      {s.status === 'pending' && (
+                        <>
+                          <button onClick={() => handleApprove(s)} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors">Approve</button>
+                          <button onClick={() => handleReject(s)} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition-colors">Reject</button>
+                        </>
+                      )}
+                      {s.status !== 'pending' && (
+                        <button onClick={() => handleAction(s._id, 'pending')} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">Set pending</button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -68,3 +68,24 @@ export const updateGrade = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Failed to update grade' });
     }
 }
+
+export const deleteGrade = async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ success: false, message: 'Grade id is required' });
+    }
+    try {
+        const grade = await Grade.findById(id);
+        if (!grade) {
+            return res.status(404).json({ success: false, message: 'Grade not found' });
+        }
+        const productId = grade.product;
+        await Grade.findByIdAndDelete(id);
+        if (productId) {
+            await Product.findByIdAndUpdate(productId, { $pull: { grades: id } });
+        }
+        return res.status(200).json({ success: true, message: 'Grade deleted successfully' });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message || 'Failed to delete grade' });
+    }
+};

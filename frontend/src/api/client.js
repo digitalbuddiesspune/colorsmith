@@ -79,6 +79,7 @@ export const grades = {
   get: (id) => client.get(`/get-grade/${id}`),
   create: (data) => client.post('/create-grade', data),
   update: (id, data) => client.put(`/update-grade/${id}`, data),
+  delete: (id) => client.delete(`/delete-grade/${id}`),
 };
 
 export const colors = {

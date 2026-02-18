@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { products, colors } from '../../api/client';
 
 export default function AdminColors() {
   const [productList, setProductList] = useState([]);
   const [colorList, setColorList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({
-    product: '',
-    name: '',
-    hexCode: '#000000',
-  });
   const [error, setError] = useState('');
 
   const load = () => {
@@ -36,70 +31,11 @@ export default function AdminColors() {
     return p?.name ?? productId;
   };
 
-  const openCreate = () => {
-    setEditingId(null);
-    setForm({
-      product: productList[0]?._id ?? '',
-      name: '',
-      hexCode: '#000000',
-    });
-    setError('');
-  };
-
-  const openEdit = (color) => {
-    setEditingId(color._id);
-    setForm({
-      product: color.product?._id ?? color.product ?? '',
-      name: color.name ?? '',
-      hexCode: color.hexCode ?? '#000000',
-    });
-    setError('');
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    openCreate();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.product || !form.name?.trim()) {
-      setError('Product and name are required.');
-      return;
-    }
-    const hex = form.hexCode?.trim() || '#000000';
-    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-      setError('Hex code must be like #FF5733 (6 hex digits).');
-      return;
-    }
-    setError('');
-    try {
-      if (editingId) {
-        await colors.update(editingId, {
-          name: form.name.trim(),
-          hexCode: hex,
-          product: form.product,
-        });
-      } else {
-        await colors.create({
-          product: form.product,
-          name: form.name.trim(),
-          hexCode: hex,
-        });
-      }
-      cancelEdit();
-      load();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save color');
-    }
-  };
-
   const deleteColor = async (id) => {
     if (!confirm('Delete this color?')) return;
     setError('');
     try {
       await colors.delete(id);
-      if (editingId === id) setEditingId(null);
       load();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete');
@@ -112,13 +48,12 @@ export default function AdminColors() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium text-slate-900">Colors</h2>
-        <button
-          type="button"
-          onClick={openCreate}
+        <Link
+          to="/admin/colors/new"
           className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
         >
           Add color
-        </button>
+        </Link>
       </div>
 
       {error && (
@@ -126,78 +61,6 @@ export default function AdminColors() {
           {error}
         </div>
       )}
-
-      <div className="mb-6 p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
-        <h3 className="text-slate-900 font-medium mb-4">
-          {editingId ? 'Edit color' : 'Add color'}
-        </h3>
-        <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2 max-w-2xl">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Product *</label>
-            <select
-              value={form.product}
-              onChange={(e) => setForm((f) => ({ ...f, product: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900"
-              required
-              disabled={!!editingId}
-            >
-              <option value="">Select product</option>
-              {productList.map((p) => (
-                <option key={p._id} value={p._id}>{p.name}</option>
-              ))}
-            </select>
-            {editingId && (
-              <p className="mt-1 text-xs text-slate-500">Product cannot be changed when editing.</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900"
-              placeholder="e.g. Ruby Red"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Hex code *</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={form.hexCode}
-                onChange={(e) => setForm((f) => ({ ...f, hexCode: e.target.value }))}
-                className="h-10 w-14 rounded border border-slate-300 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={form.hexCode}
-                onChange={(e) => setForm((f) => ({ ...f, hexCode: e.target.value }))}
-                className="flex-1 px-4 py-2 rounded-lg border border-slate-300 text-slate-900 font-mono"
-                placeholder="#FF5733"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 sm:col-span-2">
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
-            >
-              {editingId ? 'Update' : 'Add color'}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                onClick={cancelEdit}
-                className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
 
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <table className="w-full text-sm">
@@ -226,13 +89,12 @@ export default function AdminColors() {
                 <td className="px-4 py-3 text-slate-900">{c.name}</td>
                 <td className="px-4 py-3 font-mono text-slate-600">{c.hexCode}</td>
                 <td className="px-4 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => openEdit(c)}
+                  <Link
+                    to={`/admin/colors/${c._id}/edit`}
                     className="text-amber-600 hover:underline font-medium mr-3"
                   >
                     Edit
-                  </button>
+                  </Link>
                   <button
                     type="button"
                     onClick={() => deleteColor(c._id)}
@@ -246,7 +108,9 @@ export default function AdminColors() {
           </tbody>
         </table>
         {colorList.length === 0 && (
-          <div className="px-4 py-8 text-center text-slate-500">No colors yet. Add one above.</div>
+          <div className="px-4 py-8 text-center text-slate-500">
+            No colors yet. <Link to="/admin/colors/new" className="text-amber-600 hover:underline">Add one</Link>.
+          </div>
         )}
       </div>
     </div>

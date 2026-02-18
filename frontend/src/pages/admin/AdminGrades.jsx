@@ -1,18 +1,13 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { products, grades } from '../../api/client';
 
 export default function AdminGrades() {
   const [productList, setProductList] = useState([]);
   const [gradeList, setGradeList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({
-    product: '',
-    name: '',
-    price: '',
-    isActive: true,
-  });
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -37,64 +32,17 @@ export default function AdminGrades() {
     return p?.name ?? productId;
   };
 
-  const openCreate = () => {
-    setEditingId(null);
-    setForm({
-      product: productList[0]?._id ?? '',
-      name: '',
-      price: '',
-      isActive: true,
-    });
-    setError('');
-  };
-
-  const openEdit = (grade) => {
-    setEditingId(grade._id);
-    setForm({
-      product: grade.product?._id ?? grade.product ?? '',
-      name: grade.name ?? '',
-      price: grade.price ?? '',
-      isActive: grade.isActive !== false,
-    });
-    setError('');
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    openCreate();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.product || !form.name?.trim()) {
-      setError('Product and name are required.');
-      return;
-    }
-    const price = Number(form.price);
-    if (Number.isNaN(price) || price < 0) {
-      setError('Price must be a valid number.');
-      return;
-    }
+  const handleDelete = async (grade) => {
+    if (!window.confirm(`Delete grade "${grade.name}"? This cannot be undone.`)) return;
+    setDeletingId(grade._id);
     setError('');
     try {
-      if (editingId) {
-        await grades.update(editingId, {
-          name: form.name.trim(),
-          price,
-          isActive: form.isActive,
-        });
-      } else {
-        await grades.create({
-          product: form.product,
-          name: form.name.trim(),
-          price,
-          isActive: form.isActive,
-        });
-      }
-      cancelEdit();
+      await grades.delete(grade._id);
       load();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save grade');
+      setError(err.response?.data?.message || 'Failed to delete grade');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -104,13 +52,12 @@ export default function AdminGrades() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium text-slate-900">Grades</h2>
-        <button
-          type="button"
-          onClick={openCreate}
+        <Link
+          to="/admin/grades/new"
           className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
         >
           Add grade
-        </button>
+        </Link>
       </div>
 
       {error && (
@@ -118,85 +65,6 @@ export default function AdminGrades() {
           {error}
         </div>
       )}
-
-      <div className="mb-6 p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
-        <h3 className="text-slate-900 font-medium mb-4">
-          {editingId ? 'Edit grade' : 'Add grade'}
-        </h3>
-        <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2 max-w-2xl">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Product *</label>
-            <select
-              value={form.product}
-              onChange={(e) => setForm((f) => ({ ...f, product: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900"
-              required
-              disabled={!!editingId}
-            >
-              <option value="">Select product</option>
-              {productList.map((p) => (
-                <option key={p._id} value={p._id}>{p.name}</option>
-              ))}
-            </select>
-            {editingId && (
-              <p className="mt-1 text-xs text-slate-500">Product cannot be changed when editing.</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900"
-              placeholder="e.g. Premium"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Price *</label>
-            <input
-              type="number"
-              step="any"
-              min="0"
-              value={form.price}
-              onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900"
-              placeholder="0.00"
-              required
-            />
-          </div>
-          <div className="flex items-center gap-2 sm:items-end">
-            <input
-              type="checkbox"
-              id="gradeIsActive"
-              checked={form.isActive}
-              onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-              className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
-            />
-            <label htmlFor="gradeIsActive" className="text-sm text-slate-700">
-              Active
-            </label>
-          </div>
-          <div className="flex gap-2 sm:col-span-2">
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
-            >
-              {editingId ? 'Update' : 'Add grade'}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                onClick={cancelEdit}
-                className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
 
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <table className="w-full text-sm">
@@ -219,12 +87,19 @@ export default function AdminGrades() {
                 <td className="px-4 py-3 text-slate-600">{g.price}</td>
                 <td className="px-4 py-3 text-slate-600">{g.isActive !== false ? 'Yes' : 'No'}</td>
                 <td className="px-4 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => openEdit(g)}
-                    className="text-amber-600 hover:underline font-medium"
+                  <Link
+                    to={`/admin/grades/${g._id}/edit`}
+                    className="text-amber-600 hover:underline font-medium mr-3"
                   >
                     Edit
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(g)}
+                    disabled={deletingId === g._id}
+                    className="text-red-600 hover:underline font-medium disabled:opacity-50"
+                  >
+                    {deletingId === g._id ? 'Deleting…' : 'Delete'}
                   </button>
                 </td>
               </tr>
@@ -232,7 +107,9 @@ export default function AdminGrades() {
           </tbody>
         </table>
         {gradeList.length === 0 && (
-          <div className="px-4 py-8 text-center text-slate-500">No grades yet. Add one above.</div>
+          <div className="px-4 py-8 text-center text-slate-500">
+            No grades yet. <Link to="/admin/grades/new" className="text-amber-600 hover:underline">Add one</Link>.
+          </div>
         )}
       </div>
     </div>

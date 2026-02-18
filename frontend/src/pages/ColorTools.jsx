@@ -487,14 +487,22 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
     formData.append('notes', form.notes);
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
-      if (data.success) {
+      const [web3Res, apiPayload] = await Promise.all([
+        fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData }),
+        colorSuggestions.create({
+          name: form.name.trim(),
+          hexCode: form.hexCode.trim(),
+          product: form.product || undefined,
+          notes: form.notes?.trim() || undefined,
+        }).then((r) => r.data).catch(() => null),
+      ]);
+      const web3Data = await web3Res.json();
+      if (web3Data.success) {
         setResult('Form Submitted Successfully');
         setForm({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
+        if (apiPayload?.data) {
+          setMySuggestions((prev) => [apiPayload.data, ...prev]);
+        }
       } else {
         setResult('Error');
       }

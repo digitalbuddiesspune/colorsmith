@@ -22,7 +22,9 @@ import AdminCategoryForm from './pages/admin/AdminCategoryForm';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminGrades from './pages/admin/AdminGrades';
+import AdminGradeForm from './pages/admin/AdminGradeForm';
 import AdminColors from './pages/admin/AdminColors';
+import AdminColorForm from './pages/admin/AdminColorForm';
 import AdminColorSets from './pages/admin/AdminColorSets';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
@@ -69,7 +71,11 @@ function App() {
               <Route path="products/new" element={<AdminProductForm />} />
               <Route path="products/:id/edit" element={<AdminProductForm />} />
               <Route path="grades" element={<AdminGrades />} />
+              <Route path="grades/new" element={<AdminGradeForm />} />
+              <Route path="grades/:id/edit" element={<AdminGradeForm />} />
               <Route path="colors" element={<AdminColors />} />
+              <Route path="colors/new" element={<AdminColorForm />} />
+              <Route path="colors/:id/edit" element={<AdminColorForm />} />
               <Route path="color-sets" element={<AdminColorSets />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="orders/:id" element={<AdminOrderDetail />} />

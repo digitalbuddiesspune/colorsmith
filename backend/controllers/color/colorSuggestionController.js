@@ -49,8 +49,8 @@ export const getAllSuggestions = async (req, res) => {
 export const updateSuggestionStatus = async (req, res) => {
   const { id } = req.params;
   const { status, adminNotes } = req.body;
-  if (!['approved', 'rejected'].includes(status)) {
-    return res.status(400).json({ success: false, message: 'Status must be approved or rejected.' });
+  if (!['pending', 'approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ success: false, message: 'Status must be pending, approved, or rejected.' });
   }
   try {
     const suggestion = await ColorSuggestion.findByIdAndUpdate(
