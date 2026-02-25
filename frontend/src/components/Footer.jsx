@@ -22,16 +22,16 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="mt-auto overflow-hidden pb-20 sm:pb-0" style={{ background: '#2C1A0E' }}>
+    <footer className="mt-auto overflow-hidden pb-20 sm:pb-0" style={{ background: '#2b2b2b' }}>
       {/* rose petals SVG background */}
-     
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
           <div className="sm:col-span-2">
-          <img src={Logo} alt="Color Smith" className="lg:h-16 h-10 mb-4" />
+            <img src={Logo} alt="Color Smith" className="lg:h-16 h-10 mb-4" />
             {/* <img src={logoImg} alt="Color Smith" className="w-20 h-20" /> */}
-            
+
             <p className="text-white/70 text-sm">
               Color Smith is a leading provider of cosmetics raw materials and finished products. We offer a wide range of products, including nail lacquers, lipsticks, lip gloss, primers, eyeliners, mascara & more — multiple grades and colors.
             </p>
@@ -82,17 +82,43 @@ export default function Footer() {
               Contact
             </h3>
             <ul className="space-y-2 text-white/70 text-sm">
-              <li>
-                <a href="mailto:contact@colorsmith.com" className="hover:text-amber-300 transition-colors">
-                  contact@colorsmith.com
+              <li className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <a href="mailto:bcproducts@gmail.com" className="hover:text-amber-300 transition-colors">
+                  bcproducts@gmail.com
                 </a>
               </li>
-              <li>
-                <a href="tel:+1234567890" className="hover:text-amber-300 transition-colors">
-                  +91 93110 29421
+              <li className="flex gap-2 ">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 4.5c0-1.243 1.007-2.25 2.25-2.25h2.118c.967 0 1.812.622 2.118 1.542l.825 2.475a2.25 2.25 0 01-.516 2.304l-1.21 1.21a15.75 15.75 0 006.364 6.364l1.21-1.21a2.25 2.25 0 012.304-.516l2.475.825A2.25 2.25 0 0121.75 17.382V19.5c0 1.243-1.007 2.25-2.25 2.25h-.75C9.507 21.75 2.25 14.493 2.25 5.25V4.5z" />
+                </svg>
+             
+                  <a href="tel:+919289789721" className="hover:text-amber-300 transition-colors">
+                    +91 9289789721
+                  </a>
+              
+
+
+              </li>
+              <li className="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 4.5c0-1.243 1.007-2.25 2.25-2.25h2.118c.967 0 1.812.622 2.118 1.542l.825 2.475a2.25 2.25 0 01-.516 2.304l-1.21 1.21a15.75 15.75 0 006.364 6.364l1.21-1.21a2.25 2.25 0 012.304-.516l2.475.825A2.25 2.25 0 0121.75 17.382V19.5c0 1.243-1.007 2.25-2.25 2.25h-.75C9.507 21.75 2.25 14.493 2.25 5.25V4.5z" />
+                </svg>
+                <a href="tel:+917042075420" className="hover:text-amber-300 transition-colors">
+                  +91 7042075420
                 </a>
               </li>
-              <li>B2B inquiries welcome</li>
+              <li className="flex items-center gap-2"> <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.8-3.6A7.94 7.94 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>B2B inquiries welcome</li>
             </ul>
           </div>
 
