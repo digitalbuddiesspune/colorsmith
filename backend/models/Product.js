@@ -9,6 +9,7 @@ const productSchema = new mongoose.Schema(
     image: { type: String, required: true },
     grades: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Grade', required: true }],
     colors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Color', required: true }],
+    
     minimumOrderQuantity: { type: Number, required: true },
     stock: { type: Number, default: 0 }, // Available stock quantity
   },

@@ -118,8 +118,36 @@ export const createUser = registerUser;
 
 export const getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password');
-        return res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
+        const { page = 1, limit = 20, search = '' } = req.query;
+        const query = search
+            ? {
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { company: { $regex: search, $options: 'i' } },
+                ],
+              }
+            : {};
+
+        const total = await User.countDocuments(query);
+        const users = await User.find(query)
+            .select('-password')
+            .sort({ createdAt: -1 })
+            .skip((parseInt(page) - 1) * parseInt(limit))
+            .limit(parseInt(limit))
+            .lean();
+
+        return res.status(200).json({
+            success: true,
+            data: users,
+            pagination: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(total / parseInt(limit)),
+            },
+            message: 'Users fetched successfully',
+        });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }

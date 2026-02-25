@@ -30,6 +30,8 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminColorSuggestions from './pages/admin/AdminColorSuggestions';
+import AdminPayments from './pages/admin/AdminPayments';
+import AdminUsers from './pages/admin/AdminUsers';
 import Policies from './pages/Policies';
 import Account from './pages/Account';
 import ColorTools from './pages/ColorTools';
@@ -80,6 +82,8 @@ function App() {
               <Route path="orders" element={<AdminOrders />} />
               <Route path="orders/:id" element={<AdminOrderDetail />} />
               <Route path="color-suggestions" element={<AdminColorSuggestions />} />
+              <Route path="payments" element={<AdminPayments />} />
+              <Route path="users" element={<AdminUsers />} />
             </Route>
             
             <Route path="*" element={<Navigate to="/" replace />} />

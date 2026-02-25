@@ -128,6 +128,11 @@ export const uploadImage = (file) => {
   return client.post('/upload-image', formData);
 };
 
+export const users = {
+  list: (params) => client.get('/get-users', { params }),
+  delete: (id) => client.delete(`/delete-user/${id}`),
+};
+
 export const orders = {
   // Create Razorpay order for payment
   createRazorpayOrder: (amount) => client.post('/orders/razorpay/create', { amount }),

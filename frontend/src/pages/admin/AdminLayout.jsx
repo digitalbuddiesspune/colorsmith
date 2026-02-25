@@ -1,9 +1,28 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { user, loading } = useAuth();
+
+  // Wait for auth state to resolve before making a decision
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+        <div className="w-8 h-8 border-4 border-slate-300 border-t-slate-700 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Must have an admin token AND role === 'admin'
+  const adminToken = localStorage.getItem('colorsmith_admin_token');
+  const isAdmin = !!adminToken && user?.role === 'admin';
+
+  if (!isAdmin) {
+    return <Navigate to="/admin/login" replace />;
+  }
 
   return (
     <div className="flex h-screen bg-slate-100 overflow-hidden">

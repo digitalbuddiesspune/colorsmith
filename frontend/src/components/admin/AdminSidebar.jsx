@@ -11,6 +11,8 @@ const navItems = [
   { to: '/admin/grades', end: false, label: 'Grades', icon: 'grade' },
   { to: '/admin/colors', end: false, label: 'Colors', icon: 'color' },
   { to: '/admin/color-suggestions', end: false, label: 'Color Suggestions', icon: 'palette' },
+  { to: '/admin/payments', end: false, label: 'Payments', icon: 'payments' },
+  { to: '/admin/users', end: false, label: 'Users', icon: 'users' },
 ];
 
 function Icon({ name }) {
@@ -61,6 +63,20 @@ function Icon({ name }) {
     return (
       <svg className={c} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+    );
+  }
+  if (name === 'payments') {
+    return (
+      <svg className={c} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+    );
+  }
+  if (name === 'users') {
+    return (
+      <svg className={c} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6 5.87a4 4 0 100-8 4 4 0 000 8zm6-10a4 4 0 10-8 0 4 4 0 008 0z" />
       </svg>
     );
   }

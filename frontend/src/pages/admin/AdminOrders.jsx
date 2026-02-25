@@ -41,6 +41,7 @@ export default function AdminOrders() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, pages: 1 });
   const [statusFilter, setStatusFilter] = useState('');
+  const [paymentFilter, setPaymentFilter] = useState('');
   const [exportLoading, setExportLoading] = useState(false);
   const limit = 10;
 
@@ -49,6 +50,7 @@ export default function AdminOrders() {
     try {
       const params = { page, limit };
       if (statusFilter) params.status = statusFilter;
+      if (paymentFilter) params.paymentStatus = paymentFilter;
       const res = await ordersApi.adminList(params);
       setOrders(res.data.orders || []);
       setPagination(res.data.pagination || { total: 0, pages: 1 });
@@ -61,7 +63,7 @@ export default function AdminOrders() {
 
   useEffect(() => {
     fetchOrders();
-  }, [page, statusFilter]);
+  }, [page, statusFilter, paymentFilter]);
 
   const pendingCount = orders.filter(o => o.orderStatus === 'pending' || o.orderStatus === 'confirmed').length;
   const deliveredCount = orders.filter(o => o.orderStatus === 'delivered').length;
@@ -85,6 +87,7 @@ export default function AdminOrders() {
     try {
       const params = { page: 1, limit: 10000 };
       if (statusFilter) params.status = statusFilter;
+      if (paymentFilter) params.paymentStatus = paymentFilter;
       const res = await ordersApi.adminList(params);
       const list = res.data.orders || [];
       const formatDateForExport = (date) => {
@@ -169,20 +172,32 @@ export default function AdminOrders() {
         </div>
       </div>
 
-      {/* Filter */}
-      <div className="mb-4">
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 mb-4">
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white"
+          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300"
         >
-          <option value="">All Orders</option>
+          <option value="">All Order Status</option>
           <option value="pending">Pending</option>
           <option value="confirmed">Confirmed</option>
           <option value="processing">Processing</option>
           <option value="shipped">Shipped</option>
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
+        </select>
+
+        <select
+          value={paymentFilter}
+          onChange={(e) => { setPaymentFilter(e.target.value); setPage(1); }}
+          className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300"
+        >
+          <option value="">All Payment Status</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Unpaid</option>
+          <option value="failed">Failed</option>
+          <option value="refunded">Refunded</option>
         </select>
       </div>
 

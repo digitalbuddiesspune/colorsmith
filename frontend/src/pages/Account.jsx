@@ -174,10 +174,6 @@ export default function Account() {
                 <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Company</p>
                 <p className="text-sm text-slate-700">{user.company || '—'}</p>
               </div>
-              <div>
-                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Role</p>
-                <p className="text-sm text-slate-700 capitalize">{user.role || 'Client'}</p>
-              </div>
             </div>
           )}
 

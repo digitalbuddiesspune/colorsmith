@@ -278,8 +278,18 @@ export const cancelOrder = async (req, res) => {
 // Admin: Get all orders
 export const getAllOrders = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20 } = req.query;
-    const query = status ? { orderStatus: status } : {};
+    const { status, paymentStatus, page = 1, limit = 20, today } = req.query;
+    const query = {};
+    if (status) query.orderStatus = status;
+    if (paymentStatus) query.paymentStatus = paymentStatus;
+
+    if (today === 'true') {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt = { $gte: startOfDay, $lte: endOfDay };
+    }
 
     const orders = await Order.find(query)
       .populate('user', 'name email')
@@ -316,6 +326,16 @@ export const getDashboardStats = async (req, res) => {
     // Today's orders count
     const todayOrders = await Order.countDocuments({
       createdAt: { $gte: startOfDay, $lt: endOfDay }
+    });
+
+    // Today's confirmed & cancelled
+    const todayConfirmedOrders = await Order.countDocuments({
+      createdAt: { $gte: startOfDay, $lt: endOfDay },
+      orderStatus: 'confirmed',
+    });
+    const todayCancelledOrders = await Order.countDocuments({
+      createdAt: { $gte: startOfDay, $lt: endOfDay },
+      orderStatus: 'cancelled',
     });
 
     // Order counts by status
@@ -413,6 +433,8 @@ export const getDashboardStats = async (req, res) => {
       success: true,
       stats: {
         todayOrders,
+        todayConfirmedOrders,
+        todayCancelledOrders,
         pendingOrders,
         confirmedOrders,
         processingOrders,

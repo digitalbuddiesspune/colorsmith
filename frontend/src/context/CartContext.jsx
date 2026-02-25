@@ -96,6 +96,13 @@ export function CartProvider({ children }) {
     }
   }, [cart, loading]);
 
+  // Helper: sort color ids so order doesn't matter when comparing
+  const sortedColorIds = (colors) =>
+    (Array.isArray(colors) ? colors : [])
+      .map((c) => String(c.id ?? c._id ?? ''))
+      .sort()
+      .join(',');
+
   const addItem = useCallback(async (item) => {
     const payload = {
       product: item.productId,
@@ -111,19 +118,55 @@ export function CartProvider({ children }) {
     if (isLoggedIn()) {
       try {
         const res = await cartApi.add(payload);
-        const newItem = normalizeItem(res.data?.data ?? res.data);
-        setCart((prev) => [...prev, newItem]);
-        return newItem.lineId;
+        const returned = normalizeItem(res.data?.data ?? res.data);
+        const wasMerged = res.data?.merged === true;
+
+        if (wasMerged) {
+          // Update the existing line in state instead of appending
+          setCart((prev) =>
+            prev.map((line) => (line.lineId === returned.lineId ? returned : line))
+          );
+        } else {
+          setCart((prev) => [...prev, returned]);
+        }
+        return returned.lineId;
       } catch (err) {
         console.error('Failed to add to cart', err);
         throw err;
       }
     } else {
-      // Guest mode: use localStorage
-      const lineId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-      const line = { ...payload, lineId, productId: item.productId };
-      setCart((prev) => [...prev, line]);
-      return lineId;
+      // Guest mode: merge locally if same product + grade + colors
+      const incomingSorted = sortedColorIds(payload.colors);
+      const gradeId = String(payload.grade?.id ?? '');
+
+      setCart((prev) => {
+        const existingIdx = prev.findIndex(
+          (line) =>
+            String(line.productId) === String(payload.product) &&
+            String(line.grade?.id ?? '') === gradeId &&
+            sortedColorIds(line.colors) === incomingSorted
+        );
+
+        if (existingIdx !== -1) {
+          const existing = prev[existingIdx];
+          const newQty = existing.quantity + payload.quantity;
+          const updated = {
+            ...existing,
+            quantity: newQty,
+            totalPrice: (existing.unitPrice ?? 0) * newQty,
+          };
+          const next = [...prev];
+          next[existingIdx] = updated;
+          return next;
+        }
+
+        // No match — add as new line
+        const lineId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        return [...prev, { ...payload, lineId, productId: item.productId }];
+      });
+
+      // Return a placeholder lineId (guest merge doesn't need a real one)
+      return null;
     }
   }, []);
 
