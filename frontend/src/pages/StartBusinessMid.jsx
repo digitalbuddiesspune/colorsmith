@@ -49,7 +49,7 @@ const GhostText = () => (
     aria-hidden
     style={{
       fontSize: 'clamp(80px, 14vw, 160px)',
-      fontFamily: '"Playfair Display", Georgia, serif',
+      fontFamily: '"Poppins", system-ui, sans-serif',
       fontWeight: 900,
       fontStyle: 'italic',
       color: 'rgba(0,0,0, 0.5)',
@@ -105,7 +105,7 @@ export default function StartBusinessMid() {
     <>
       {/* Google Font load */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
         .sbm-section * { box-sizing: border-box; }
 
@@ -143,8 +143,8 @@ export default function StartBusinessMid() {
       `}</style>
 
       <section
-        className="sbm-section relative bg-gradient-to-br from-red-50 via-red-100/80 to-rose-200/70"
-        style={{ fontFamily: '"DM Sans", sans-serif' }}
+        className="sbm-section relative"
+        style={{ background: 'linear-gradient(135deg, #F7F3EF 0%, #F5EFE8 50%, #E8D8C3 100%)', fontFamily: '"Poppins", system-ui, sans-serif' }}
       >
         {/* ── Top rule ─────────────────────────────────────────────────── */}
         <div className="h-px w-full bg-black/8" />
@@ -225,7 +225,7 @@ export default function StartBusinessMid() {
                     />
                   ))}
                   <span className="ml-2 text-[11px] text-black/30 font-medium tracking-widest">
-                    {String(currentImageIndex + 1).padStart(2,'0')} / {String(startBusinessMidImages.length).padStart(2,'0')}
+                    {String(currentImageIndex + 1).padStart(2, '0')} / {String(startBusinessMidImages.length).padStart(2, '0')}
                   </span>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export default function StartBusinessMid() {
 
               <h2
                 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-bold text-black leading-[1.05] tracking-tight mb-6"
-                style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                style={{ fontFamily: '"Poppins", system-ui, sans-serif' }}
               >
                 Start Your<br />
                 <em className="font-bold not-italic" style={{ fontStyle: 'italic' }}>

@@ -2,6 +2,12 @@ import { Link } from 'react-router-dom';
 import { scrollToTop } from '../utility/scrollToTop';
 import Logo from '../assets/logo.png';
 
+const quickLinks = [
+  { label: 'Categories', path: '/categories' },
+  { label: 'Catalog', path: '/catalog' },
+  { label: 'Color Tools', path: '/color-tools' },
+];
+
 const policies = [
   { label: 'Privacy Policy', path: '/policies/privacy' },
   { label: 'Terms of Use', path: '/policies/terms' },
@@ -16,13 +22,13 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-black mt-auto overflow-hidden pb-20 sm:pb-0">
+    <footer className="mt-auto overflow-hidden pb-20 sm:pb-0" style={{ background: '#2C1A0E' }}>
       {/* rose petals SVG background */}
      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
+          <div className="sm:col-span-2">
           <img src={Logo} alt="Color Smith" className="lg:h-16 h-10 mb-4" />
             {/* <img src={logoImg} alt="Color Smith" className="w-20 h-20" /> */}
             
@@ -30,6 +36,26 @@ export default function Footer() {
               Color Smith is a leading provider of cosmetics raw materials and finished products. We offer a wide range of products, including nail lacquers, lipsticks, lip gloss, primers, eyeliners, mascara & more — multiple grades and colors.
             </p>
           </div>
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+              Quick Links
+            </h3>
+            <ul className="space-y-2">
+              {quickLinks.map((l) => (
+                <li key={l.path}>
+                  <Link
+                    to={l.path}
+                    onClick={scrollToTop}
+                    className="text-white/70 hover:text-amber-300 text-sm transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Policies */}
           <div>
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">

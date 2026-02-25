@@ -36,7 +36,7 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-slate-50 border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-[#F7F3EF] border-t border-[#E8D8C3] shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
         <div className="flex items-stretch h-16 max-w-lg mx-auto px-2">
           {/* Home */}
           <button

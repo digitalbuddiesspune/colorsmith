@@ -22,7 +22,7 @@ function getCachedCategories() {
 function setCachedCategories(data) {
   try {
     sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch {}
+  } catch { /* empty */ }
 }
 
 function CategoryCardSkeleton() {
@@ -54,6 +54,7 @@ export default function CategoriesList() {
   useEffect(() => {
     const cached = getCachedCategories();
     if (cached && cached.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setList(cached);
       setLoading(false);
       // Optional: refetch in background to keep cache fresh

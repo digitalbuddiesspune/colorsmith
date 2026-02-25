@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-display: "Poppins", system-ui, sans-serif;
+  --font-body: "Poppins", system-ui, sans-serif;
+  --color-warm-50: #F7F3EF;
+  --color-warm-100: #F5EFE8;
+  --color-warm-200: #E8D8C3;
   --color-brand-50: #fdf4f3;
   --color-brand-100: #fbe8e6;
   --color-brand-200: #f9d5d2;
@@ -21,7 +24,8 @@
     font-family: var(--font-body);
   }
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply text-slate-900 antialiased;
+    background-color: #F7F3EF;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);

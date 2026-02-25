@@ -5,7 +5,7 @@ import BottomNav from './BottomNav';
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-[#F7F3EF]">
       <Navbar />
       <main className="flex-1">
         <Outlet />

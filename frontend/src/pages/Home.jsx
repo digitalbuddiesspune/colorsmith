@@ -46,7 +46,7 @@ export default function Home() {
         <HeroSection />
       </section>
       
-      <section id="categories" className="max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
+      <section id="categories" className=" max-w-7xl mx-auto scroll-mt-20 px-4 lg:px-0">
         <CategoriesList />
       </section>
       <section id="start-business-mid" className="scroll-mt-20">

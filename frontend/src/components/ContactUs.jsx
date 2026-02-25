@@ -159,7 +159,7 @@ export default function ContactUs() {
   return (
     <section
       id="contact"
-      className="overflow-hidden scroll-mt-20 bg-slate-50"
+      className="overflow-hidden scroll-mt-20 bg-[#F5EFE8]"
       style={{
         marginLeft: 'calc(-50vw + 50%)',
         marginRight: 'calc(-50vw + 50%)',
