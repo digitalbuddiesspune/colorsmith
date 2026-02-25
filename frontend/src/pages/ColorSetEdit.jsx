@@ -10,8 +10,10 @@ export default function ColorSetEdit() {
   const { user } = useAuth();
   const [name, setName] = useState('');
   const [productId, setProductId] = useState('');
-  const [productColors, setProductColors] = useState([]);
-  const [selectedColorIds, setSelectedColorIds] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [addFromProductId, setAddFromProductId] = useState('');
+  const [addFromColors, setAddFromColors] = useState([]);
+  const [pendingAddIds, setPendingAddIds] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -22,14 +24,17 @@ export default function ColorSetEdit() {
       setLoading(false);
       return;
     }
-    products.list().then(({ data }) => setProductList(data)).catch(() => {});
+    products.list().then((res) => {
+      const data = res.data?.data ?? res.data ?? [];
+      setProductList(Array.isArray(data) ? data : []);
+    }).catch(() => {});
     if (!isNew) {
       colorSets
         .get(id)
         .then(({ data }) => {
-          setName(data.name);
+          setName(data.name ?? '');
           setProductId(data.product?._id || '');
-          setSelectedColorIds((data.colors || []).map((c) => c._id));
+          setSelectedColors(Array.isArray(data.colors) ? data.colors : []);
         })
         .catch(() => setError('Color set not found'))
         .finally(() => setLoading(false));
@@ -39,19 +44,38 @@ export default function ColorSetEdit() {
   }, [id, isNew, user]);
 
   useEffect(() => {
-    if (!productId) {
-      setProductColors([]);
+    if (!addFromProductId) {
+      setAddFromColors([]);
+      setPendingAddIds([]);
       return;
     }
     colorSets
-      .productColors(productId)
-      .then(({ data }) => setProductColors(data))
-      .catch(() => setProductColors([]));
-  }, [productId]);
+      .productColors(addFromProductId)
+      .then(({ data }) => {
+        setAddFromColors(Array.isArray(data) ? data : []);
+        setPendingAddIds([]);
+      })
+      .catch(() => {
+        setAddFromColors([]);
+        setPendingAddIds([]);
+      });
+  }, [addFromProductId]);
 
-  const toggleColor = (colorId) => {
-    setSelectedColorIds((prev) =>
-      prev.includes(colorId) ? prev.filter((c) => c !== colorId) : [...prev, colorId]
+  const addSelectedToSet = () => {
+    const toAdd = addFromColors.filter((c) => pendingAddIds.includes(c._id));
+    const existingIds = new Set(selectedColors.map((c) => c._id));
+    const newColors = toAdd.filter((c) => !existingIds.has(c._id));
+    setSelectedColors((prev) => [...prev, ...newColors]);
+    setPendingAddIds([]);
+  };
+
+  const removeColorFromSet = (colorId) => {
+    setSelectedColors((prev) => prev.filter((c) => c._id !== colorId));
+  };
+
+  const togglePendingAdd = (colorId) => {
+    setPendingAddIds((prev) =>
+      prev.includes(colorId) ? prev.filter((id) => id !== colorId) : [...prev, colorId]
     );
   };
 
@@ -60,11 +84,12 @@ export default function ColorSetEdit() {
     setError('');
     setSaving(true);
     try {
+      const colorIds = selectedColors.map((c) => c._id);
       if (isNew) {
         const { data } = await colorSets.create({
           name,
           product: productId || undefined,
-          colorIds: selectedColorIds,
+          colorIds,
           isAdminSet: user?.role === 'admin',
         });
         navigate(`/color-set/${data._id}`);
@@ -72,7 +97,7 @@ export default function ColorSetEdit() {
         await colorSets.update(id, {
           name,
           product: productId || undefined,
-          colorIds: selectedColorIds,
+          colorIds,
         });
         navigate(`/color-set/${id}`);
       }
@@ -123,7 +148,7 @@ export default function ColorSetEdit() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">Product (optional)</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Product (optional – for reference)</label>
           <select
             value={productId}
             onChange={(e) => setProductId(e.target.value)}
@@ -135,31 +160,84 @@ export default function ColorSetEdit() {
             ))}
           </select>
         </div>
-        {productId && (
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Colors from this product</label>
-            <div className="flex flex-wrap gap-3">
-              {productColors.map((c) => (
-                <button
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Colors in this set</label>
+          {selectedColors.length ? (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {selectedColors.map((c) => (
+                <span
                   key={c._id}
-                  type="button"
-                  onClick={() => toggleColor(c._id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
-                    selectedColorIds.includes(c._id)
-                      ? 'border-brand-500 bg-brand-100 text-brand-800'
-                      : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'
-                  }`}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50"
                 >
-                  <div
-                    className="w-5 h-5 rounded-full border border-slate-300"
+                  <span
+                    className="w-5 h-5 rounded-full border border-slate-300 shrink-0"
                     style={{ backgroundColor: c.hexCode || '#666' }}
                   />
-                  {c.name}
-                </button>
+                  <span className="text-sm text-slate-700">{c.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeColorFromSet(c._id)}
+                    className="text-slate-400 hover:text-red-600 p-0.5"
+                    title="Remove from set"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </span>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-slate-500 text-sm">No colors yet. Add colors from a product below.</p>
+          )}
+        </div>
+
+        <div className="border-t border-slate-200 pt-6">
+          <label className="block text-sm font-medium text-slate-700 mb-2">Add colors from a product</label>
+          <p className="text-slate-500 text-sm mb-3">Select a product, then choose colors to add to this set. You can add colors from multiple products.</p>
+          <select
+            value={addFromProductId}
+            onChange={(e) => setAddFromProductId(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 focus:ring-2 focus:ring-brand-500 mb-3"
+          >
+            <option value="">— Choose product —</option>
+            {productList.map((p) => (
+              <option key={p._id} value={p._id}>{p.name}</option>
+            ))}
+          </select>
+          {addFromColors.length > 0 && (
+            <>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {addFromColors.map((c) => (
+                  <button
+                    key={c._id}
+                    type="button"
+                    onClick={() => togglePendingAdd(c._id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
+                      pendingAddIds.includes(c._id)
+                        ? 'border-brand-500 bg-brand-100 text-brand-800'
+                        : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'
+                    }`}
+                  >
+                    <div
+                      className="w-5 h-5 rounded-full border border-slate-300"
+                      style={{ backgroundColor: c.hexCode || '#666' }}
+                    />
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={addSelectedToSet}
+                disabled={pendingAddIds.length === 0}
+                className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                Add {pendingAddIds.length > 0 ? `${pendingAddIds.length} ` : ''}selected to set
+              </button>
+            </>
+          )}
+        </div>
+
         <div className="flex gap-3">
           <button
             type="submit"

@@ -114,6 +114,11 @@ export default function Navbar() {
               <ScrollToTopNavLink to="/color-tools" className={navLinkClass}>
                 Color Tools
               </ScrollToTopNavLink>
+              {user && (
+                <ScrollToTopNavLink to="/my-color-sets" className={navLinkClass}>
+                  Color Sets
+                </ScrollToTopNavLink>
+              )}
             </nav>
 
             <div className="flex items-center lg:gap-3 gap-1">
@@ -151,6 +156,13 @@ export default function Navbar() {
                         className="block px-4 py-2 hover:bg-slate-50"
                       >
                         My Account
+                      </Link>
+                      <Link
+                        to="/my-color-sets"
+                        onClick={() => setAccountDropdownOpen(false)}
+                        className="block px-4 py-2 hover:bg-slate-50"
+                      >
+                        My Color Sets
                       </Link>
                       <button
                         onClick={handleLogout}
