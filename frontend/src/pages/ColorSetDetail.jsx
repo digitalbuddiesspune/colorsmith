@@ -66,6 +66,7 @@ export default function ColorSetDetail() {
         quantity: qty,
         unitPrice: Number(grade.price) ?? 0,
         totalPrice: (Number(grade.price) ?? 0) * qty,
+        minimumOrderQuantity: product.minimumOrderQuantity ?? 1,
       });
       setAddedColorIds((prev) => new Set(prev).add(color._id));
     } catch {

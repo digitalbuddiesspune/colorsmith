@@ -42,6 +42,7 @@ function normalizeItem(item) {
     quantity: item.quantity ?? 1,
     unitPrice: item.unitPrice ?? 0,
     totalPrice: item.totalPrice ?? 0,
+    minimumOrderQuantity: item.minimumOrderQuantity ?? 1,
   };
 }
 
@@ -104,15 +105,17 @@ export function CartProvider({ children }) {
       .join(',');
 
   const addItem = useCallback(async (item) => {
+    const moq = Math.max(1, Number(item.minimumOrderQuantity) || 1);
     const payload = {
       product: item.productId,
       productName: item.productName ?? '',
       productImage: item.productImage ?? null,
       grade: item.grade ?? null,
       colors: Array.isArray(item.colors) ? item.colors : [],
-      quantity: Number(item.quantity) || 1,
+      quantity: Math.max(moq, Number(item.quantity) || moq),
       unitPrice: Number(item.unitPrice) ?? 0,
       totalPrice: Number(item.totalPrice) ?? 0,
+      minimumOrderQuantity: moq,
     };
 
     if (isLoggedIn()) {
@@ -182,29 +185,24 @@ export function CartProvider({ children }) {
   }, []);
 
   const updateQuantity = useCallback(async (lineId, quantity) => {
-    const qty = Math.max(1, Math.floor(Number(quantity)) || 1);
+    setCart((prev) => {
+      const item = prev.find((i) => i.lineId === lineId);
+      const moq = item?.minimumOrderQuantity ?? 1;
+      const qty = Math.max(moq, Math.floor(Number(quantity)) || moq);
 
-    if (isLoggedIn() && !lineId.startsWith('local-')) {
-      try {
-        const res = await cartApi.update(lineId, { quantity: qty });
-        const updated = normalizeItem(res.data?.data ?? res.data);
-        setCart((prev) =>
-          prev.map((item) => (item.lineId === lineId ? updated : item))
-        );
-        return;
-      } catch (err) {
-        console.error('Failed to update cart', err);
+      if (isLoggedIn() && !lineId.startsWith('local-')) {
+        cartApi.update(lineId, { quantity: qty }).then((res) => {
+          const updated = normalizeItem(res.data?.data ?? res.data);
+          setCart((c) => c.map((i) => (i.lineId === lineId ? updated : i)));
+        }).catch((err) => console.error('Failed to update cart', err));
       }
-    }
 
-    // Guest mode or fallback
-    setCart((prev) =>
-      prev.map((item) =>
-        item.lineId === lineId
-          ? { ...item, quantity: qty, totalPrice: (item.unitPrice ?? 0) * qty }
-          : item
-      )
-    );
+      return prev.map((i) =>
+        i.lineId === lineId
+          ? { ...i, quantity: qty, totalPrice: (i.unitPrice ?? 0) * qty }
+          : i
+      );
+    });
   }, []);
 
   const clearCart = useCallback(async () => {

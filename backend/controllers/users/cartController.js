@@ -13,7 +13,7 @@ export const getCart = async (req, res) => {
 };
 
 export const addToCart = async (req, res) => {
-    const { product, productName, productImage, grade, colors, quantity, unitPrice, totalPrice } = req.body;
+    const { product, productName, productImage, grade, colors, quantity, unitPrice, totalPrice, minimumOrderQuantity } = req.body;
     if (!product || !quantity || totalPrice == null) {
         return res.status(400).json({ success: false, message: 'Product, quantity and totalPrice are required' });
     }
@@ -55,6 +55,7 @@ export const addToCart = async (req, res) => {
         }
 
         // No matching item — create a fresh one
+        const moq = Math.max(1, Number(minimumOrderQuantity) || 1);
         const item = await Cart.create({
             user: req.user._id,
             product,
@@ -65,6 +66,7 @@ export const addToCart = async (req, res) => {
             quantity,
             unitPrice: unitPrice ?? 0,
             totalPrice,
+            minimumOrderQuantity: moq,
         });
         res.status(201).json({ success: true, data: item, merged: false });
     } catch (error) {
@@ -75,17 +77,19 @@ export const addToCart = async (req, res) => {
 export const updateCart = async (req, res) => {
     const { id } = req.params;
     const { quantity, unitPrice } = req.body;
-    if (!quantity || quantity < 1) {
-        return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
-    }
     try {
         const item = await Cart.findOne({ _id: id, user: req.user._id });
         if (!item) {
             return res.status(404).json({ success: false, message: 'Cart item not found' });
         }
+        const moq = item.minimumOrderQuantity ?? 1;
+        const qty = Math.max(moq, Math.floor(Number(quantity)) || moq);
+        if (!quantity || qty < moq) {
+            return res.status(400).json({ success: false, message: `Quantity must be at least ${moq}` });
+        }
         const price = unitPrice ?? item.unitPrice ?? 0;
-        const total = price * quantity;
-        const updated = await Cart.findByIdAndUpdate(id, { quantity, unitPrice: price, totalPrice: total }, { new: true });
+        const total = price * qty;
+        const updated = await Cart.findByIdAndUpdate(id, { quantity: qty, unitPrice: price, totalPrice: total }, { new: true });
         res.status(200).json({
             success: true,
             data: updated,

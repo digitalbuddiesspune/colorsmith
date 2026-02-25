@@ -56,6 +56,7 @@ export default function Cart() {
         <div className="flex-1 min-w-0 space-y-3">
           {cart.map((item) => {
             const color = item.colors?.[0];
+            const moq = item.minimumOrderQuantity ?? 1;
             return (
               <div
                 key={item.lineId}
@@ -107,20 +108,20 @@ export default function Cart() {
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      onClick={() => updateQuantity(item.lineId, Math.max(1, item.quantity - 1))}
-                      disabled={item.quantity <= 1}
+                      onClick={() => updateQuantity(item.lineId, item.quantity - moq)}
+                      disabled={item.quantity <= moq}
                       className="w-8 h-8 rounded-md border border-slate-300 bg-white text-slate-700 text-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
                     >−</button>
                     <input
                       type="number"
-                      min={1}
+                      min={moq}
                       value={item.quantity}
                       onChange={(e) => updateQuantity(item.lineId, e.target.value)}
                       className="w-14 h-8 px-1 rounded-md border border-slate-300 text-slate-900 text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
                     <button
                       type="button"
-                      onClick={() => updateQuantity(item.lineId, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.lineId, item.quantity + moq)}
                       className="w-8 h-8 rounded-md border border-slate-300 bg-white text-slate-700 text-sm hover:bg-slate-50 flex items-center justify-center"
                     >+</button>
                     <span className="text-slate-400 text-xs ml-0.5">kg</span>

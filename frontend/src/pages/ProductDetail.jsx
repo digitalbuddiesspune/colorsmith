@@ -118,7 +118,7 @@ export default function ProductDetail() {
       const cur = sel.colorQuantities[colorId] ?? minimumOrderQuantity;
       return {
         ...prev,
-        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: cur + 1 } },
+        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: cur + minimumOrderQuantity } },
       };
     });
   };
@@ -131,7 +131,7 @@ export default function ProductDetail() {
       const sel = prev[gradeId] ?? { colorIds: [], colorQuantities: {} };
       return {
         ...prev,
-        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: cur - 1 } },
+        [gradeId]: { ...sel, colorQuantities: { ...sel.colorQuantities, [colorId]: cur - minimumOrderQuantity } },
       };
     });
   };
@@ -192,6 +192,7 @@ export default function ProductDetail() {
           quantity: line.qty,
           unitPrice: line.grade?.price ?? 0,
           totalPrice: Number(line.grade?.price ?? 0) * line.qty,
+          minimumOrderQuantity,
         });
       }
       setAddedToCart(true);
