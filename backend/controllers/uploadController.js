@@ -50,3 +50,44 @@ export const uploadImage = async (req, res) => {
     });
   }
 };
+
+/**
+ * Upload color suggestion reference image (any logged-in user).
+ * Stores in Cloudinary folder colorsmith/suggestions.
+ */
+export const uploadSuggestionImage = async (req, res) => {
+  try {
+    cloudinary.config(getCloudinaryConfig());
+
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ success: false, message: 'No image file provided' });
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid file type. Use JPEG, PNG, GIF, or WebP.',
+      });
+    }
+
+    const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: 'colorsmith/suggestions',
+      resource_type: 'image',
+    });
+
+    return res.status(200).json({
+      success: true,
+      url: result.secure_url,
+      publicId: result.public_id,
+    });
+  } catch (err) {
+    console.error('Cloudinary suggestion upload error:', err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Failed to upload image',
+    });
+  }
+};

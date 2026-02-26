@@ -1,6 +1,8 @@
 import Order from '../../models/Order.js';
 import Cart from '../../models/cart.js';
 import Product from '../../models/Product.js';
+import User from '../../models/User.js';
+import { sendWhatsAppMessage } from '../../services/whatsappService.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 
@@ -186,6 +188,26 @@ export const createOrder = async (req, res) => {
 
     // Clear user's cart after successful order
     await Cart.deleteMany({ user: userId });
+
+    // Send order confirmation WhatsApp: use profile WhatsApp number, else shipping phone
+    const user = await User.findById(userId).select('name phone').lean();
+    const toPhone = user?.phone || shippingAddress?.phone;
+    if (toPhone) {
+      const orderNum = order.orderNumber || order._id.toString().slice(-8);
+      const totalStr = Number(order.grandTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+      const itemCount = order.items?.length || 0;
+      const body = `Hi ${user?.name || 'there'}! Your order #${orderNum} has been confirmed. ${itemCount} item(s), Total: ₹${totalStr}. Thank you for shopping with Color Smith!`;
+      sendWhatsAppMessage(toPhone, body)
+        .then((r) => {
+          if (r.success) console.log('WhatsApp order confirmation sent to', toPhone);
+          else console.warn('WhatsApp order confirmation:', r.error);
+        })
+        .catch((err) => {
+          console.error('WhatsApp order confirmation failed:', err?.message || err);
+        });
+    } else {
+      console.warn('WhatsApp order confirmation skipped: no phone on profile or shipping address');
+    }
 
     return res.status(201).json({
       success: true,

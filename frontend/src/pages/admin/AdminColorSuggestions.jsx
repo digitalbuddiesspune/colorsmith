@@ -45,7 +45,7 @@ export default function AdminColorSuggestions() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Color Suggestions</h1>
-          <p className="text-slate-500 text-sm mt-1">Review and manage color suggestions from clients</p>
+          <p className="text-slate-500 text-sm mt-1">Review and manage color suggestions from clients. Approving a suggestion sends a WhatsApp notification to the user if they have a number on file.</p>
         </div>
         <div className="flex gap-2">
           {['all', 'pending', 'approved', 'rejected'].map((f) => (
@@ -68,6 +68,7 @@ export default function AdminColorSuggestions() {
                 <th className="px-4 py-3 font-semibold text-slate-600">User</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">Product</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">Notes</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">Image</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">Status</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">Actions</th>
               </tr>
@@ -82,9 +83,26 @@ export default function AdminColorSuggestions() {
                     <span className="font-medium text-slate-800">{s.name}</span>
                     <span className="block text-xs text-slate-400 font-mono">{s.hexCode}</span>
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{s.user?.name ?? '—'}</td>
+                  <td className="px-4 py-3 text-slate-600">
+                    <span className="block">{s.user?.name ?? '—'}</span>
+                    {s.user?.phone && <span className="block text-xs text-slate-400">WhatsApp: {s.user.phone}</span>}
+                  </td>
                   <td className="px-4 py-3 text-slate-600">{s.product?.name ?? '—'}</td>
                   <td className="px-4 py-3 text-slate-500 max-w-[180px] truncate">{s.notes || '—'}</td>
+                  <td className="px-4 py-3">
+                    {s.imageUrl ? (
+                      <a
+                        href={s.imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
+                      >
+                        View image
+                      </a>
+                    ) : (
+                      <span className="text-slate-400 text-sm">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-semibold px-2 py-1 rounded-full capitalize ${statusColors[s.status]}`}>{s.status}</span>
                   </td>

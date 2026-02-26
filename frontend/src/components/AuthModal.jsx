@@ -37,7 +37,7 @@ function Divider() {
 
 export default function AuthModal({ mode: initialMode = 'login', onClose, onSuccess, redirectTo }) {
   const [mode, setMode] = useState(initialMode);
-  const [form, setForm] = useState({ name: '', email: '', password: '', company: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', company: '', phone: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
@@ -56,7 +56,7 @@ export default function AuthModal({ mode: initialMode = 'login', onClose, onSucc
       if (mode === 'login') {
         await login(form.email, form.password);
       } else {
-        await register({ name: form.name, email: form.email, password: form.password, company: form.company });
+        await register({ name: form.name, email: form.email, password: form.password, company: form.company, phone: form.phone || undefined });
       }
       onSuccess?.();
       if (redirectTo) {
@@ -79,7 +79,7 @@ export default function AuthModal({ mode: initialMode = 'login', onClose, onSucc
   const switchMode = () => {
     setMode((m) => (m === 'login' ? 'register' : 'login'));
     setError('');
-    setForm({ name: '', email: '', password: '', company: '' });
+    setForm({ name: '', email: '', password: '', company: '', phone: '' });
   };
 
   return (
@@ -186,6 +186,24 @@ export default function AuthModal({ mode: initialMode = 'login', onClose, onSucc
                 className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 placeholder="Company name"
               />
+            </div>
+          )}
+
+          {mode === 'register' && (
+            <div>
+              <label htmlFor="auth-phone" className="block text-sm font-medium text-slate-700 mb-1.5">
+                WhatsApp number <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input
+                id="auth-phone"
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                placeholder="e.g. 919876543210"
+              />
+              <p className="mt-1 text-xs text-slate-500">We'll notify you on WhatsApp when your color suggestion is approved.</p>
             </div>
           )}
 

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FilesetResolver, FaceLandmarker, HandLandmarker } from '@mediapipe/tasks-vision';
-import { colors as colorsApi, products as productsApi, colorSuggestions } from '../api/client';
+import { colors as colorsApi, products as productsApi, colorSuggestions, uploadSuggestionImage } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { scrollToTop } from '../utility/scrollToTop';
 
@@ -454,6 +454,7 @@ const WEB3FORMS_ACCESS_KEY = 'd3adc8c3-08fc-4141-b63a-133586243760';
 function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) {
   const { user } = useAuth();
   const [form, setForm] = useState({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
+  const [referenceImage, setReferenceImage] = useState(null);
   const [result, setResult] = useState('');
   const [mySuggestions, setMySuggestions] = useState([]);
   const [loadingMine, setLoadingMine] = useState(false);
@@ -486,6 +487,17 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
     formData.append('product', productName);
     formData.append('notes', form.notes);
 
+    let imageUrl = null;
+    if (referenceImage) {
+      try {
+        const up = await uploadSuggestionImage(referenceImage);
+        imageUrl = up.data?.url ?? null;
+      } catch {
+        setResult('Error');
+        return;
+      }
+    }
+
     try {
       const [web3Res, apiPayload] = await Promise.all([
         fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData }),
@@ -494,12 +506,14 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
           hexCode: form.hexCode.trim(),
           product: form.product || undefined,
           notes: form.notes?.trim() || undefined,
+          imageUrl: imageUrl || undefined,
         }).then((r) => r.data).catch(() => null),
       ]);
       const web3Data = await web3Res.json();
       if (web3Data.success) {
         setResult('Form Submitted Successfully');
         setForm({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
+        setReferenceImage(null);
         if (apiPayload?.data) {
           setMySuggestions((prev) => [apiPayload.data, ...prev]);
         }
@@ -567,6 +581,26 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">Notes</label>
               <textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Describe the shade, reference image link, etc." className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">Reference photo (optional)</label>
+              <p className="text-neutral-500 text-xs mb-2">Upload a photo so our team can see the shade you have in mind. Stored securely and visible to admins only.</p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={(e) => setReferenceImage(e.target.files?.[0] ?? null)}
+                  className="block w-full text-sm text-neutral-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200"
+                />
+                {referenceImage && (
+                  <button type="button" onClick={() => setReferenceImage(null)} className="text-sm text-neutral-500 hover:text-red-600">
+                    Remove
+                  </button>
+                )}
+              </div>
+              {referenceImage && (
+                <p className="mt-1 text-xs text-neutral-500">{referenceImage.name}</p>
+              )}
             </div>
 
             {/* preview */}

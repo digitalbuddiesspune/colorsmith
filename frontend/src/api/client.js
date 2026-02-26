@@ -121,11 +121,18 @@ export const colorSuggestions = {
   adminUpdate: (id, data) => client.put(`/color-suggestions/${id}`, data),
 };
 
-/** Upload image file to Cloudinary via backend. Returns { data: { url } }. */
+/** Upload image file to Cloudinary via backend. Returns { data: { url } }. (Admin only.) */
 export const uploadImage = (file) => {
   const formData = new FormData();
   formData.append('image', file);
   return client.post('/upload-image', formData);
+};
+
+/** Upload color suggestion reference image. Returns { data: { url } }. (Any logged-in user.) */
+export const uploadSuggestionImage = (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  return client.post('/upload-suggestion-image', formData);
 };
 
 export const users = {

@@ -7,6 +7,7 @@ const colorSuggestionSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     hexCode: { type: String, required: true, trim: true },
     notes: { type: String, trim: true },
+    imageUrl: { type: String, trim: true },
     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
     adminNotes: { type: String, trim: true },
   },

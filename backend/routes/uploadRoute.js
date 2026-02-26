@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadImage } from '../controllers/uploadController.js';
+import { uploadImage, uploadSuggestionImage } from '../controllers/uploadController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -29,5 +29,17 @@ router.post('/upload-image', protect, adminOnly, (req, res, next) => {
     next();
   });
 }, uploadImage);
+
+router.post('/upload-suggestion-image', protect, (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ success: false, message: 'File too large. Max 5 MB.' });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'Invalid file' });
+    }
+    next();
+  });
+}, uploadSuggestionImage);
 
 export default router;

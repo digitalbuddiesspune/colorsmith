@@ -7,7 +7,7 @@ const generateToken = (id) => {
 
 // Register new user
 export const registerUser = async (req, res) => {
-    const { name, email, password, company } = req.body;
+    const { name, email, password, company, phone } = req.body;
     if (!name || !email || !password) {
         return res.status(400).json({ success: false, message: 'Name, email and password are required' });
     }
@@ -21,6 +21,7 @@ export const registerUser = async (req, res) => {
             email: email.toLowerCase(),
             password,
             company: company || undefined,
+            phone: phone || undefined,
         });
         const token = generateToken(newUser._id);
         return res.status(201).json({
@@ -31,6 +32,7 @@ export const registerUser = async (req, res) => {
             email: newUser.email,
             role: newUser.role,
             company: newUser.company,
+            phone: newUser.phone,
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message || 'Failed to register user' });
@@ -61,6 +63,7 @@ export const userLogin = async (req, res) => {
             email: foundUser.email,
             role: foundUser.role,
             company: foundUser.company,
+            phone: foundUser.phone,
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message || 'Login failed' });
@@ -81,6 +84,7 @@ export const getMe = async (req, res) => {
             email: foundUser.email,
             role: foundUser.role,
             company: foundUser.company,
+            phone: foundUser.phone,
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -155,11 +159,16 @@ export const getUsers = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { name, email, company } = req.body;
+    const { name, email, company, phone } = req.body;
+    const updateFields = {};
+    if (name !== undefined) updateFields.name = name;
+    if (email !== undefined) updateFields.email = email;
+    if (company !== undefined) updateFields.company = company;
+    if (phone !== undefined) updateFields.phone = phone;
     try {
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            { name, email, company },
+            updateFields,
             { new: true }
         ).select('-password');
         if (!updatedUser) {

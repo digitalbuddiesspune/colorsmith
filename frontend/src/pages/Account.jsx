@@ -13,6 +13,7 @@ export default function Account() {
   const [profileForm, setProfileForm] = useState({
     name: user?.name || '',
     company: user?.company || '',
+    phone: user?.phone || '',
   });
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState(null);
@@ -45,8 +46,9 @@ export default function Account() {
       const { data } = await auth.updateProfile(user._id, {
         name: profileForm.name,
         company: profileForm.company,
+        phone: profileForm.phone || undefined,
       });
-      updateUser({ name: data.data.name, company: data.data.company });
+      updateUser({ name: data.data.name, company: data.data.company, phone: data.data.phone });
       setProfileMsg({ type: 'success', text: 'Profile updated successfully.' });
       setEditing(false);
     } catch (err) {
@@ -114,7 +116,7 @@ export default function Account() {
               <button
                 type="button"
                 onClick={() => {
-                  setProfileForm({ name: user.name || '', company: user.company || '' });
+                  setProfileForm({ name: user.name || '', company: user.company || '', phone: user.phone || '' });
                   setEditing(true);
                   setProfileMsg(null);
                 }}
@@ -147,6 +149,17 @@ export default function Account() {
                   className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-colors"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">WhatsApp number</label>
+                <input
+                  type="tel"
+                  value={profileForm.phone}
+                  onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                  placeholder="e.g. 919876543210 (with country code)"
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-colors"
+                />
+                <p className="mt-1 text-xs text-slate-500">We'll notify you on WhatsApp when your color suggestion is approved.</p>
+              </div>
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
@@ -173,6 +186,10 @@ export default function Account() {
               <div>
                 <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Company</p>
                 <p className="text-sm text-slate-700">{user.company || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">WhatsApp number</p>
+                <p className="text-sm text-slate-700">{user.phone || '—'}</p>
               </div>
             </div>
           )}

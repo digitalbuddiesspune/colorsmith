@@ -1,8 +1,9 @@
 import ColorSuggestion from '../../models/ColorSuggestion.js';
+import { sendWhatsAppMessage } from '../../services/whatsappService.js';
 
 // Create a color suggestion (protected — any logged-in user)
 export const createSuggestion = async (req, res) => {
-  const { name, hexCode, product, notes } = req.body;
+  const { name, hexCode, product, notes, imageUrl } = req.body;
   if (!name || !hexCode) {
     return res.status(400).json({ success: false, message: 'Color name and hex code are required.' });
   }
@@ -13,6 +14,7 @@ export const createSuggestion = async (req, res) => {
       hexCode,
       product: product || undefined,
       notes: notes || undefined,
+      imageUrl: imageUrl || undefined,
     });
     return res.status(201).json({ success: true, data: suggestion });
   } catch (error) {
@@ -36,7 +38,7 @@ export const getMySuggestions = async (req, res) => {
 export const getAllSuggestions = async (req, res) => {
   try {
     const suggestions = await ColorSuggestion.find()
-      .populate('user', 'name email')
+      .populate('user', 'name email phone')
       .populate('product', 'name')
       .sort({ createdAt: -1 });
     return res.status(200).json({ success: true, data: suggestions });
@@ -57,10 +59,25 @@ export const updateSuggestionStatus = async (req, res) => {
       id,
       { status, adminNotes: adminNotes || undefined },
       { new: true }
-    );
+    )
+      .populate('user', 'name phone');
     if (!suggestion) {
       return res.status(404).json({ success: false, message: 'Suggestion not found.' });
     }
+
+    if (status === 'approved' && suggestion.user?.phone) {
+      const userName = suggestion.user.name || 'Customer';
+      const colorName = suggestion.name || 'your suggested color';
+      let body = `Hi ${userName}! Good news — your color suggestion "${colorName}" has been approved by Color Smith.`;
+      if (adminNotes && adminNotes.trim()) {
+        body += `\n\nNote from our team: ${adminNotes.trim()}`;
+      }
+      body += '\n\nThank you for your suggestion!';
+      sendWhatsAppMessage(suggestion.user.phone, body).catch((err) => {
+        console.error('WhatsApp approval notification failed:', err?.message || err);
+      });
+    }
+
     return res.status(200).json({ success: true, data: suggestion });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
