@@ -266,9 +266,9 @@ export default function StartBusinessMid() {
                 ))}
               </div>
 
-              {/* CTA */}
+              {/* CTA — scroll to Get in touch / contact section */}
               <Link
-                to="/register"
+                to="/#contact"
                 className="sbm-btn inline-flex items-center justify-center gap-3 border border-black rounded-none
                            bg-black text-white px-8 py-3.5 text-[13px] font-medium tracking-widest uppercase
                            transition-colors duration-300 shadow-none"
