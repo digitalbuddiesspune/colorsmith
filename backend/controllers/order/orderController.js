@@ -21,6 +21,48 @@ const getRazorpay = () => {
   return razorpayInstance;
 };
 
+/**
+ * Create Razorpay UPI QR for COD order (single-use, fixed amount).
+ * Returns { id, image_url } or null if creation fails.
+ * Note: UPI QR feature may need to be enabled on your Razorpay account.
+ */
+async function createRazorpayUpiQr(orderNumber, amountInr) {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keyId || !keySecret) return null;
+  const amountPaise = Math.max(100, Math.round(Number(amountInr) * 100));
+  const closeBy = Math.floor(Date.now() / 1000) + 2 * 60 * 60; // 2 hours from now
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+  try {
+    const res = await fetch('https://api.razorpay.com/v1/payments/qr_codes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${auth}`,
+      },
+      body: JSON.stringify({
+        type: 'upi_qr',
+        name: `Order ${orderNumber}`,
+        usage: 'single_use',
+        fixed_amount: true,
+        payment_amount: amountPaise,
+        description: `Color Smith Order ${orderNumber} - Pay via UPI`,
+        close_by: closeBy,
+      }),
+    });
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('Razorpay QR create failed:', res.status, errBody);
+      return null;
+    }
+    const data = await res.json();
+    return { id: data.id, image_url: data.image_url };
+  } catch (err) {
+    console.error('Razorpay UPI QR create error:', err?.message || err);
+    return null;
+  }
+}
+
 // Create Razorpay order (for online payment)
 export const createRazorpayOrder = async (req, res) => {
   try {
@@ -186,6 +228,16 @@ export const createOrder = async (req, res) => {
 
     await order.save();
 
+    // For COD: create Razorpay UPI QR so customer can pay via UPI (invoice will show QR)
+    if (paymentMethod === 'COD') {
+      const qr = await createRazorpayUpiQr(order.orderNumber, order.grandTotal);
+      if (qr?.image_url) {
+        order.upiQrImageUrl = qr.image_url;
+        order.razorpayQrId = qr.id;
+        await order.save();
+      }
+    }
+
     // Clear user's cart after successful order
     await Cart.deleteMany({ user: userId });
 
@@ -226,6 +278,8 @@ export const createOrder = async (req, res) => {
         paymentStatus: order.paymentStatus,
         orderStatus: order.orderStatus,
         createdAt: order.createdAt,
+        upiQrImageUrl: order.upiQrImageUrl || undefined,
+        razorpayQrId: order.razorpayQrId || undefined,
       },
     });
   } catch (error) {

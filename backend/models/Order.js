@@ -46,6 +46,8 @@ const orderSchema = new mongoose.Schema({
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
+  upiQrImageUrl: { type: String },
+  razorpayQrId: { type: String },
   orderStatus: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
