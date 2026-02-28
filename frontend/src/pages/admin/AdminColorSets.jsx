@@ -18,13 +18,24 @@ export default function AdminColorSets() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium text-slate-900">All color sets</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <Link
+            to="/admin"
+            className="text-slate-600 hover:text-slate-900 text-sm mb-2 inline-block"
+          >
+            ← Back to Dashboard
+          </Link>
+          <h2 className="text-lg font-medium text-slate-900">Color sets</h2>
+          <p className="text-slate-500 text-sm mt-0.5">
+            Admin-created sets are visible to all users. Create or edit sets below.
+          </p>
+        </div>
         <Link
           to="/color-set/new/edit"
-          className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600"
+          className="px-4 py-2 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600 shrink-0"
         >
-          Create color set
+          Create color set (for all users)
         </Link>
       </div>
       <div className="space-y-3">
@@ -36,8 +47,10 @@ export default function AdminColorSets() {
             <div className="flex items-center gap-4">
               <div>
                 <span className="font-medium text-slate-900">{s.name}</span>
-                {s.isAdminSet && (
-                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-amber-100 text-amber-800">Admin</span>
+                {s.isAdminSet ? (
+                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800">Visible to all users</span>
+                ) : (
+                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-600">User set</span>
                 )}
               </div>
               <div className="flex gap-1">
@@ -54,12 +67,20 @@ export default function AdminColorSets() {
                 )}
               </div>
             </div>
-            <Link
-              to={`/color-set/${s._id}`}
-              className="text-amber-600 hover:underline text-sm font-medium"
-            >
-              View
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                to={`/color-set/${s._id}/edit`}
+                className="text-amber-600 hover:underline text-sm font-medium"
+              >
+                Edit
+              </Link>
+              <Link
+                to={`/color-set/${s._id}`}
+                className="text-slate-600 hover:underline text-sm font-medium"
+              >
+                View
+              </Link>
+            </div>
           </div>
         ))}
       </div>

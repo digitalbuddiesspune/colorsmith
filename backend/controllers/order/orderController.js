@@ -351,13 +351,19 @@ export const cancelOrder = async (req, res) => {
   }
 };
 
+// Valid payment status values for filtering (must match Order model enum)
+const PAYMENT_STATUS_VALUES = ['pending', 'paid', 'failed', 'refunded'];
+
 // Admin: Get all orders
 export const getAllOrders = async (req, res) => {
   try {
     const { status, paymentStatus, page = 1, limit = 20, today } = req.query;
     const query = {};
-    if (status) query.orderStatus = status;
-    if (paymentStatus) query.paymentStatus = paymentStatus;
+    if (status && String(status).trim()) query.orderStatus = String(status).trim();
+    const paymentStatusVal = paymentStatus != null ? String(paymentStatus).trim().toLowerCase() : '';
+    if (paymentStatusVal && PAYMENT_STATUS_VALUES.includes(paymentStatusVal)) {
+      query.paymentStatus = paymentStatusVal;
+    }
 
     if (today === 'true') {
       const startOfDay = new Date();

@@ -2,7 +2,7 @@ import Grade from '../../models/Grade.js';
 import Product from '../../models/Product.js';
 
 export const createGrade = async (req, res) => {
-    const { product, name, price, isActive } = req.body;
+    const { product, name, description, price, isActive } = req.body;
     if (!product || !name || price == null || price === '') {
         return res.status(400).json({ message: 'Product, name and price are required' });
     }
@@ -10,6 +10,7 @@ export const createGrade = async (req, res) => {
         const grade = await Grade.create({
             product,
             name: name.trim(),
+            description: description != null ? String(description).trim() : '',
             price: Number(price),
             isActive: isActive !== false,
         });
@@ -50,14 +51,20 @@ export const getGradeById = async (req, res) => {
 
 export const updateGrade = async (req, res) => {
     const { id } = req.params;
-    const { name, price, isActive } = req.body;
+    const { name, description, price, isActive } = req.body;
     if (!id || !name || price == null || price === '') {
         return res.status(400).json({ success: false, message: 'Name and price are required' });
     }
     try {
+        const updateData = {
+            name: name.trim(),
+            price: Number(price),
+            isActive: isActive !== false,
+        };
+        if (description !== undefined) updateData.description = String(description).trim();
         const grade = await Grade.findByIdAndUpdate(
             id,
-            { name: name.trim(), price: Number(price), isActive: isActive !== false },
+            updateData,
             { new: true }
         );
         if (!grade) {

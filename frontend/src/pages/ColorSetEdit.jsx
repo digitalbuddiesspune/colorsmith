@@ -10,6 +10,7 @@ export default function ColorSetEdit() {
   const { user } = useAuth();
   const [name, setName] = useState('');
   const [productId, setProductId] = useState('');
+  const [isAdminSet, setIsAdminSet] = useState(false);
   const [selectedColors, setSelectedColors] = useState([]);
   const [addFromProductId, setAddFromProductId] = useState('');
   const [addFromColors, setAddFromColors] = useState([]);
@@ -34,6 +35,7 @@ export default function ColorSetEdit() {
         .then(({ data }) => {
           setName(data.name ?? '');
           setProductId(data.product?._id || '');
+          setIsAdminSet(Boolean(data.isAdminSet));
           setSelectedColors(Array.isArray(data.colors) ? data.colors : []);
         })
         .catch(() => setError('Color set not found'))
@@ -41,6 +43,7 @@ export default function ColorSetEdit() {
     } else {
       setLoading(false);
     }
+    if (isNew && user?.role === 'admin') setIsAdminSet(true);
   }, [id, isNew, user]);
 
   useEffect(() => {
@@ -90,7 +93,7 @@ export default function ColorSetEdit() {
           name,
           product: productId || undefined,
           colorIds,
-          isAdminSet: user?.role === 'admin',
+          isAdminSet: user?.role === 'admin' ? isAdminSet : false,
         });
         navigate(`/color-set/${data._id}`);
       } else {
@@ -98,6 +101,7 @@ export default function ColorSetEdit() {
           name,
           product: productId || undefined,
           colorIds,
+          ...(user?.role === 'admin' && { isAdminSet: isAdminSet }),
         });
         navigate(`/color-set/${id}`);
       }
@@ -160,6 +164,21 @@ export default function ColorSetEdit() {
             ))}
           </select>
         </div>
+
+        {user?.role === 'admin' && (
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="isAdminSet"
+              checked={isAdminSet}
+              onChange={(e) => setIsAdminSet(e.target.checked)}
+              className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+            />
+            <label htmlFor="isAdminSet" className="text-sm font-medium text-slate-700">
+              Available to all users (admin color set)
+            </label>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Colors in this set</label>

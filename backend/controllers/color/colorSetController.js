@@ -111,7 +111,7 @@ export const create = async (req, res) => {
   }
 };
 
-/** Update color set (name, product?, colorIds) */
+/** Update color set (name, product?, colorIds, isAdminSet for admin only) */
 export const update = async (req, res) => {
   try {
     const set = await ColorSet.findById(req.params.id);
@@ -119,13 +119,15 @@ export const update = async (req, res) => {
 
     const isAdmin = req.isAdmin === true;
     const isOwner = String(set.createdBy) === String(req.user._id);
-    if (!set.isAdminSet && !isOwner) {
+    const canEdit = isOwner || (set.isAdminSet && isAdmin);
+    if (!canEdit) {
       return res.status(403).json({ message: 'Not allowed to edit this color set' });
     }
 
-    const { name, product, colorIds } = req.body;
+    const { name, product, colorIds, isAdminSet } = req.body;
     if (name != null && typeof name === 'string') set.name = name.trim();
     if (product !== undefined) set.product = product || undefined;
+    if (isAdmin && isAdminSet !== undefined) set.isAdminSet = isAdminSet === true;
     await set.save();
 
     if (Array.isArray(colorIds)) {
@@ -157,8 +159,10 @@ export const remove = async (req, res) => {
     const set = await ColorSet.findById(req.params.id);
     if (!set) return res.status(404).json({ message: 'Color set not found' });
 
+    const isAdmin = req.isAdmin === true;
     const isOwner = String(set.createdBy) === String(req.user._id);
-    if (!set.isAdminSet && !isOwner) {
+    const canDelete = isOwner || (set.isAdminSet && isAdmin);
+    if (!canDelete) {
       return res.status(403).json({ message: 'Not allowed to delete this color set' });
     }
 

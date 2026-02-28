@@ -147,7 +147,7 @@ export const generateInvoicePDF = async (order) => {
     // "TAX INVOICE" title
     doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
-    doc.text('TAX INVOICE', pageWidth / 2, yPos, { align: 'center' });
+    doc.text('PROFORMA INVOICE', pageWidth / 2, yPos, { align: 'center' });
     yPos += 4;
 
     // Divider line
@@ -184,7 +184,6 @@ export const generateInvoicePDF = async (order) => {
 
     const col1X = leftMargin;
     const col2X = leftMargin + 60;
-    const col1Width = 57;
     const rowHeight = 5;
     const tableStartY = yPos;
 

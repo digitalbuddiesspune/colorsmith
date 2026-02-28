@@ -10,6 +10,7 @@ const navItems = [
   { to: '/admin/products', end: false, label: 'Products', icon: 'box' },
   { to: '/admin/grades', end: false, label: 'Grades', icon: 'grade' },
   { to: '/admin/colors', end: false, label: 'Colors', icon: 'color' },
+  { to: '/admin/color-sets', end: false, label: 'Color Sets', icon: 'colorSets' },
   { to: '/admin/color-suggestions', end: false, label: 'Color Suggestions', icon: 'palette' },
   { to: '/admin/payments', end: false, label: 'Payments', icon: 'payments' },
   { to: '/admin/users', end: false, label: 'Users', icon: 'users' },
@@ -49,6 +50,13 @@ function Icon({ name }) {
     return (
       <svg className={c} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2m-4-1h8m-4-1H4" />
+      </svg>
+    );
+  }
+  if (name === 'colorSets') {
+    return (
+      <svg className={c} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
       </svg>
     );
   }

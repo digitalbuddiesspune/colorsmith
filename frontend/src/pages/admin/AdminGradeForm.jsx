@@ -14,6 +14,7 @@ export default function AdminGradeForm() {
   const [form, setForm] = useState({
     product: '',
     name: '',
+    description: '',
     price: '',
     isActive: true,
   });
@@ -34,6 +35,7 @@ export default function AdminGradeForm() {
             setForm({
               product: grade.product?._id ?? grade.product ?? '',
               name: grade.name ?? '',
+              description: grade.description ?? '',
               price: grade.price ?? '',
               isActive: grade.isActive !== false,
             });
@@ -67,6 +69,7 @@ export default function AdminGradeForm() {
       if (isEdit) {
         await grades.update(id, {
           name: form.name.trim(),
+          description: form.description?.trim() ?? '',
           price,
           isActive: form.isActive,
         });
@@ -74,6 +77,7 @@ export default function AdminGradeForm() {
         await grades.create({
           product: form.product,
           name: form.name.trim(),
+          description: form.description?.trim() ?? '',
           price,
           isActive: form.isActive,
         });
@@ -135,6 +139,16 @@ export default function AdminGradeForm() {
               className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               placeholder="e.g. Premium"
               required
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              placeholder="Optional description for this grade"
+              rows={3}
             />
           </div>
           <div>
