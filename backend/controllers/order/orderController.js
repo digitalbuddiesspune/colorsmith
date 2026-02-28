@@ -303,6 +303,41 @@ export const getOrders = async (req, res) => {
   }
 };
 
+// Get UPI QR image for COD order (proxy to avoid CORS)
+export const getOrderQrImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    const isAdmin = req.isAdmin === true;
+
+    const order = await Order.findById(id).select('upiQrImageUrl paymentMethod user').lean();
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (!order.upiQrImageUrl || order.paymentMethod !== 'COD') {
+      return res.status(404).json({ message: 'QR image not available' });
+    }
+    if (!isAdmin && String(order.user) !== String(userId)) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    const imgRes = await fetch(order.upiQrImageUrl, {
+      headers: { Accept: 'image/*' },
+      redirect: 'follow',
+    });
+    if (!imgRes.ok) {
+      console.error('QR image fetch failed:', imgRes.status, order.upiQrImageUrl);
+      return res.status(502).json({ message: 'Failed to fetch QR image' });
+    }
+    const contentType = imgRes.headers.get('content-type') || 'image/png';
+    const buffer = Buffer.from(await imgRes.arrayBuffer());
+    res.set('Content-Type', contentType);
+    res.set('Cache-Control', 'private, max-age=3600');
+    res.send(buffer);
+  } catch (err) {
+    console.error('getOrderQrImage error:', err);
+    res.status(500).json({ message: err.message || 'Failed to get QR image' });
+  }
+};
+
 // Get single order by ID
 export const getOrderById = async (req, res) => {
   try {

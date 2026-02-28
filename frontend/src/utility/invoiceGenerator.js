@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 import { formatOrderId } from './formatedOrderId';
 
 // Convert number to words for invoice amount (Indian numbering system)
@@ -84,6 +85,20 @@ const COMPANY_INFO = {
   gstNumber: '09AHCPC5752E1ZM',
   stateCode: '09',
   state: 'Uttar Pradesh',
+  // Set VITE_UPI_ID in .env for UPI payment QR (e.g. merchant@paytm)
+  upiId: import.meta.env.VITE_UPI_ID || '',
+};
+
+// Generate UPI payment QR as data URL (client-side, no external fetch)
+const generateUpiQrDataUrl = async (amount, orderNumber) => {
+  const upiId = COMPANY_INFO.upiId?.trim();
+  const pn = encodeURIComponent(COMPANY_INFO.name);
+  const am = amount.toFixed(2);
+  const tn = encodeURIComponent(`Order ${orderNumber}`);
+  const upiString = upiId
+    ? `upi://pay?pa=${upiId}&pn=${pn}&am=${am}&cu=INR&tn=${tn}`
+    : `Pay ₹${am} for Order ${orderNumber}`;
+  return QRCode.toDataURL(upiString, { width: 256, margin: 2 });
 };
 
 // Generate invoice PDF
@@ -237,9 +252,9 @@ export const generateInvoicePDF = async (order) => {
       yPos += 4;
     }
     doc.text(`Address: ${customerAddress}`, leftMargin + 3, yPos);
-    yPos += 4;
-    doc.text('GST No: URP', leftMargin + 3, yPos);
     yPos += 8;
+    // doc.text('GST No: URP', leftMargin + 3, yPos);
+    // yPos += 8;
 
     // ========== ORDER DETAILS SECTION ==========
     doc.setFillColor(64, 64, 64);
@@ -428,6 +443,41 @@ export const generateInvoicePDF = async (order) => {
       yPos += 4;
     });
     yPos += 8;
+
+    // ========== UPI QR CODE (COD only) ==========
+    if (order.paymentMethod === 'COD') {
+      if (yPos > pageHeight - 55) {
+        doc.addPage();
+        yPos = 20;
+      }
+      try {
+        const orderNum = formatOrderId(order.orderNumber || order._id);
+        const qrDataUrl = await generateUpiQrDataUrl(grandTotal, orderNum);
+        const qrSize = 40;
+        const qrX = pageWidth - leftMargin - qrSize;
+        const qrY = yPos;
+
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Pay via UPI at delivery', leftMargin + 3, qrY - 2);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Amount: ₹${grandTotal.toFixed(2)}`, leftMargin + 3, qrY + 2);
+
+        doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.2);
+        doc.rect(qrX, qrY, qrSize, qrSize);
+
+        yPos += qrSize + 8;
+      } catch (err) {
+        console.warn('Could not embed UPI QR in invoice:', err);
+        doc.setFontSize(9);
+        doc.setTextColor(80, 80, 80);
+        doc.text(`Pay ₹${grandTotal.toFixed(2)} via UPI at delivery`, leftMargin + 3, yPos);
+        yPos += 6;
+      }
+    }
 
     // ========== FOOTER ==========
     doc.setFontSize(7);

@@ -5,6 +5,7 @@ import {
   createOrder, 
   getOrders, 
   getOrderById, 
+  getOrderQrImage,
   cancelOrder,
   getAllOrders,
   updateOrderStatus,
@@ -22,6 +23,7 @@ orderRouter.post('/razorpay/create', createRazorpayOrder);
 orderRouter.post('/razorpay/verify', verifyRazorpayPayment);
 orderRouter.post('/', createOrder);
 orderRouter.get('/', getOrders);
+orderRouter.get('/:id/qr-image', getOrderQrImage);
 orderRouter.get('/:id', getOrderById);
 orderRouter.put('/:id/cancel', cancelOrder);
 
