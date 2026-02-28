@@ -120,7 +120,7 @@ function AIColorMatch({ allColors, loading, onAddToSuggestion, onApplyOnLipsNail
         const similarity = Math.round((1 - dist / MAX_DIST) * 100);
         return { ...c, similarity };
       })
-      .filter((c) => c.similarity >= 50)
+      .filter((c) => c.similarity > 90)
       .sort((a, b) => b.similarity - a.similarity);
   }, [allColors]);
 
