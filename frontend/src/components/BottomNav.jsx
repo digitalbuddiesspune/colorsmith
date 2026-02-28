@@ -93,24 +93,9 @@ export default function BottomNav() {
             to="/color-tools"
             className={({ isActive }) => `${base} ${isActive ? active : inactive}`}
           >
-            <svg
-              className="w-6 h-6 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.8}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 3a9 9 0 100 18h1.5a1.5 1.5 0 000-3H12a6 6 0 110-12 6 6 0 016 6v1.5a1.5 1.5 0 003 0V12a9 9 0 00-9-9z"
-              />
-              <circle cx="7.5" cy="10.5" r="1" fill="currentColor" />
-              <circle cx="10.5" cy="7.5" r="1" fill="currentColor" />
-              <circle cx="15" cy="8.5" r="1" fill="currentColor" />
-              <circle cx="16.5" cy="13" r="1" fill="currentColor" />
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z" />
             </svg>
-
             <span>Tools</span>
           </ScrollToTopNavLink>
 
