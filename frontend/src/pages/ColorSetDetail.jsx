@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-binary-expression */
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -64,6 +65,7 @@ export default function ColorSetDetail() {
         grade: { id: gradeId, name: grade.name, price: grade.price },
         colors: [{ id: color._id, name: color.name ?? '', hexCode: color.hexCode ?? '#888' }],
         quantity: qty,
+        // eslint-disable-next-line no-constant-binary-expression
         unitPrice: Number(grade.price) ?? 0,
         totalPrice: (Number(grade.price) ?? 0) * qty,
         minimumOrderQuantity: product.minimumOrderQuantity ?? 1,
@@ -96,7 +98,7 @@ export default function ColorSetDetail() {
   const canEdit = user?.role === 'admin' || (setData.createdBy?._id === user?._id && !setData.isAdminSet);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <Link to="/my-color-sets" className="text-slate-600 hover:text-slate-900 text-sm mb-6 inline-block">
         ← My Color Sets
       </Link>
@@ -125,7 +127,6 @@ export default function ColorSetDetail() {
             const grades = product?.grades ?? [];
             const moq = product?.minimumOrderQuantity ?? 1;
             const selectedGradeId = selectedGradeByColor[c._id];
-            const grade = grades.find((g) => getGradeId(g) === selectedGradeId);
             const qty = Math.max(moq, Number(quantityByColor[c._id]) || moq);
             const canAdd = product && grades.length > 0;
             const isAdding = addingColorId === c._id;
@@ -175,18 +176,43 @@ export default function ColorSetDetail() {
                     </div>
                     <div className="flex items-center gap-2">
                       <label className="text-xs font-medium text-slate-500">Qty (kg)</label>
-                      <input
-                        type="number"
-                        min={moq}
-                        value={quantityByColor[c._id] ?? moq}
-                        onChange={(e) => {
-                          const v = parseInt(e.target.value, 10);
-                          if (!isNaN(v) && v >= moq) {
-                            setQuantityByColor((prev) => ({ ...prev, [c._id]: v }));
-                          }
-                        }}
-                        className="w-20 px-3 py-2 rounded-lg border border-slate-300 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500"
-                      />
+                      <div className="flex items-center rounded-lg border border-slate-300 overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cur = Math.max(moq, Number(quantityByColor[c._id]) || moq);
+                            if (cur > moq) {
+                              setQuantityByColor((prev) => ({ ...prev, [c._id]: cur - moq }));
+                            }
+                          }}
+                          disabled={qty <= moq}
+                          className="w-8 h-9 flex items-center justify-center bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          min={moq}
+                          value={quantityByColor[c._id] ?? moq}
+                          onChange={(e) => {
+                            const v = parseInt(e.target.value, 10);
+                            if (!isNaN(v) && v >= moq) {
+                              setQuantityByColor((prev) => ({ ...prev, [c._id]: v }));
+                            }
+                          }}
+                          className="w-16 px-2 py-2 text-center border-0 border-x border-slate-200 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:ring-inset"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cur = Math.max(moq, Number(quantityByColor[c._id]) || moq);
+                            setQuantityByColor((prev) => ({ ...prev, [c._id]: cur + moq }));
+                          }}
+                          className="w-8 h-9 flex items-center justify-center bg-slate-100 text-slate-600 hover:bg-slate-200 text-sm font-medium"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                     <button
                       type="button"
