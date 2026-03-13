@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useMessage } from '../context/MessageContext';
 import { orders as ordersApi } from '../api/client';
 import { formatOrderId } from '../utility/formatedOrderId';
 import { generateInvoicePDF } from '../utility/invoiceGenerator';
@@ -23,6 +24,7 @@ const paymentStatusColors = {
 
 export default function Orders() {
   const { user } = useAuth();
+  const { showMessage } = useMessage();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function Orders() {
       await generateInvoicePDF(order);
     } catch (err) {
       console.error('Failed to generate invoice:', err);
-      alert('Failed to generate invoice. Please try again.');
+      showMessage('Failed to generate invoice. Please try again.', 'error');
     } finally {
       setGeneratingInvoice(null);
     }

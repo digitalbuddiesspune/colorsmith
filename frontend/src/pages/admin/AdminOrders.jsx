@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { orders as ordersApi } from '../../api/client';
 import { formatOrderId } from '../../utility/formatedOrderId';
+import { useMessage } from '../../context/MessageContext';
 
 // Order Status Badge Component
 function StatusBadge({ status, type = 'order' }) {
@@ -36,6 +37,7 @@ function StatusBadge({ status, type = 'order' }) {
 
 export default function AdminOrders() {
   const navigate = useNavigate();
+  const { showMessage } = useMessage();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -117,7 +119,7 @@ export default function AdminOrders() {
       XLSX.writeFile(wb, filename);
     } catch (err) {
       console.error('Export failed:', err);
-      alert('Failed to download orders. Please try again.');
+      showMessage('Failed to download orders. Please try again.', 'error');
     } finally {
       setExportLoading(false);
     }

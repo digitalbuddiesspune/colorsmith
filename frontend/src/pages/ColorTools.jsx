@@ -453,7 +453,7 @@ const WEB3FORMS_ACCESS_KEY = 'd3adc8c3-08fc-4141-b63a-133586243760';
 
 function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) {
   const { user } = useAuth();
-  const [form, setForm] = useState({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
+  const [form, setForm] = useState({ hexCode: '#ff6b6b', product: '', notes: '' });
   const [referenceImage, setReferenceImage] = useState(null);
   const [result, setResult] = useState('');
   const [mySuggestions, setMySuggestions] = useState([]);
@@ -477,13 +477,12 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    if (!form.name || !form.hexCode) return;
+    if (!form.hexCode || !form.hexCode.trim()) return;
     setResult('Sending....');
     const productName = form.product ? (allProducts.find((p) => p._id === form.product)?.name ?? '') : '';
     const formData = new FormData();
     formData.append('access_key', WEB3FORMS_ACCESS_KEY);
-    formData.append('name', form.name);
-    formData.append('hexCode', form.hexCode);
+    formData.append('hexCode', form.hexCode.trim());
     formData.append('product', productName);
     formData.append('notes', form.notes);
 
@@ -502,7 +501,6 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
       const [web3Res, apiPayload] = await Promise.all([
         fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData }),
         colorSuggestions.create({
-          name: form.name.trim(),
           hexCode: form.hexCode.trim(),
           product: form.product || undefined,
           notes: form.notes?.trim() || undefined,
@@ -512,7 +510,7 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
       const web3Data = await web3Res.json();
       if (web3Data.success) {
         setResult('Form Submitted Successfully');
-        setForm({ name: '', hexCode: '#ff6b6b', product: '', notes: '' });
+        setForm({ hexCode: '#ff6b6b', product: '', notes: '' });
         setReferenceImage(null);
         if (apiPayload?.data) {
           setMySuggestions((prev) => [apiPayload.data, ...prev]);
@@ -558,17 +556,12 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
           )}
 
           <form onSubmit={onSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Color name *</label>
-                <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sunset Coral" className="w-full px-4 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Color code *</label>
-                <div className="flex gap-2">
-                  <input type="color" value={form.hexCode} onChange={(e) => setForm({ ...form, hexCode: e.target.value })} className="w-12 h-10 rounded-lg border border-neutral-300 cursor-pointer p-0.5" />
-                  <input type="text" value={form.hexCode} onChange={(e) => setForm({ ...form, hexCode: e.target.value })} className="flex-1 px-4 py-2.5 rounded-lg border border-neutral-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900" />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">Hex code *</label>
+              <p className="text-neutral-500 text-xs mb-2">Pick or enter the shade you want. Our team will assign a color name and code after review.</p>
+              <div className="flex gap-2">
+                <input type="color" value={form.hexCode} onChange={(e) => setForm({ ...form, hexCode: e.target.value })} className="w-12 h-10 rounded-lg border border-neutral-300 cursor-pointer p-0.5" />
+                <input type="text" value={form.hexCode} onChange={(e) => setForm({ ...form, hexCode: e.target.value })} placeholder="#ff6b6b" className="flex-1 px-4 py-2.5 rounded-lg border border-neutral-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900" />
               </div>
             </div>
             <div>
@@ -607,7 +600,7 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
             <div className="flex items-center gap-4 p-4 rounded-xl bg-neutral-50 border border-neutral-100">
               <div className="w-14 h-14 rounded-xl border-2 border-white shadow-md shrink-0" style={{ backgroundColor: form.hexCode }} />
               <div>
-                <p className="text-sm font-semibold text-neutral-800">{form.name || 'Color preview'}</p>
+                <p className="text-sm font-semibold text-neutral-800">Preview</p>
                 <p className="text-xs font-mono text-neutral-400">{form.hexCode}</p>
               </div>
             </div>
@@ -632,7 +625,7 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
               <div key={s._id} className="flex items-center gap-3 p-3 rounded-xl border border-neutral-200 bg-white">
                 <div className="w-10 h-10 rounded-lg shrink-0 border border-neutral-200" style={{ backgroundColor: s.hexCode }} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-neutral-800 truncate">{s.name}</p>
+                  <p className="text-sm font-medium text-neutral-800 truncate">{s.name || 'Pending review'}</p>
                   <p className="text-xs text-neutral-400 font-mono">{s.hexCode}</p>
                 </div>
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${statusStyles[s.status] ?? ''}`}>{s.status}</span>

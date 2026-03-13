@@ -11,6 +11,11 @@ export default function AdminColorSuggestions() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [actionPopup, setActionPopup] = useState(null);
+  const [adminNotes, setAdminNotes] = useState('');
+  const [colorName, setColorName] = useState('');
+  const [colorCode, setColorCode] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchList = () => {
     setLoading(true);
@@ -22,20 +27,59 @@ export default function AdminColorSuggestions() {
 
   useEffect(() => { fetchList(); }, []);
 
-  const handleAction = async (id, status, adminNotes = undefined) => {
+  const handleAction = async (id, payload) => {
+    setSubmitting(true);
     try {
-      await colorSuggestions.adminUpdate(id, { status, adminNotes });
+      await colorSuggestions.adminUpdate(id, payload);
       fetchList();
+      setActionPopup(null);
+      setAdminNotes('');
+      setColorName('');
+      setColorCode('');
     } catch { }
+    finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleApprove = (s) => {
-    const note = window.prompt('Optional note for this suggestion:');
-    handleAction(s._id, 'approved', note !== null ? note.trim() || undefined : undefined);
+  const openApprovePopup = (s) => {
+    setActionPopup({ suggestion: s, action: 'approved' });
+    setAdminNotes('');
+    setColorName(s.name || '');
+    setColorCode(s.colorCode || s.hexCode || '');
   };
-  const handleReject = (s) => {
-    const note = window.prompt('Optional reason for rejection:');
-    handleAction(s._id, 'rejected', note !== null ? note.trim() || undefined : undefined);
+  const openRejectPopup = (s) => {
+    setActionPopup({ suggestion: s, action: 'rejected' });
+    setAdminNotes('');
+    setColorName('');
+    setColorCode('');
+  };
+  const closePopup = () => {
+    if (!submitting) {
+      setActionPopup(null);
+      setAdminNotes('');
+      setColorName('');
+      setColorCode('');
+    }
+  };
+  const submitAction = () => {
+    if (!actionPopup) return;
+    if (actionPopup.action === 'approved') {
+      const nameTrim = colorName.trim();
+      const codeTrim = colorCode.trim();
+      if (!nameTrim || !codeTrim) return;
+      handleAction(actionPopup.suggestion._id, {
+        status: 'approved',
+        adminNotes: adminNotes.trim() || undefined,
+        name: nameTrim,
+        colorCode: codeTrim,
+      });
+    } else {
+      handleAction(actionPopup.suggestion._id, {
+        status: 'rejected',
+        adminNotes: adminNotes.trim() || undefined,
+      });
+    }
   };
 
   const filtered = filter === 'all' ? list : list.filter((s) => s.status === filter);
@@ -64,7 +108,7 @@ export default function AdminColorSuggestions() {
             <thead>
               <tr className="bg-slate-50 text-left">
                 <th className="px-4 py-3 font-semibold text-slate-600">Color</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">Name</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">Code</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">User</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">Product</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">Notes</th>
@@ -79,9 +123,8 @@ export default function AdminColorSuggestions() {
                   <td className="px-4 py-3">
                     <div className="w-8 h-8 rounded-lg border border-slate-200" style={{ backgroundColor: s.hexCode }} title={s.hexCode} />
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="font-medium text-slate-800">{s.name}</span>
-                    <span className="block text-xs text-slate-400 font-mono">{s.hexCode}</span>
+                  <td className="px-4 py-3 text-slate-600 font-mono text-xs">
+                    {[s.colorCode, s.hexCode].filter(Boolean).join(' · ') || '—'}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     <span className="block">{s.user?.name ?? '—'}</span>
@@ -110,12 +153,12 @@ export default function AdminColorSuggestions() {
                     <div className="flex flex-wrap gap-1.5">
                       {s.status === 'pending' && (
                         <>
-                          <button onClick={() => handleApprove(s)} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors">Approve</button>
-                          <button onClick={() => handleReject(s)} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition-colors">Reject</button>
+                          <button onClick={() => openApprovePopup(s)} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors">Approve</button>
+                          <button onClick={() => openRejectPopup(s)} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition-colors">Reject</button>
                         </>
                       )}
                       {s.status !== 'pending' && (
-                        <button onClick={() => handleAction(s._id, 'pending')} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">Set pending</button>
+                        <button onClick={() => handleAction(s._id, { status: 'pending' })} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">Set pending</button>
                       )}
                     </div>
                   </td>
@@ -123,6 +166,78 @@ export default function AdminColorSuggestions() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Approve / Reject popup */}
+      {actionPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closePopup} aria-hidden="true" />
+          <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-md animate-in fade-in zoom-in-95 duration-200" role="dialog" aria-modal="true" aria-labelledby="action-popup-title">
+            <h2 id="action-popup-title" className="text-lg font-semibold text-slate-900 mb-4">
+              {actionPopup.action === 'approved' ? 'Approve suggestion' : 'Reject suggestion'}
+            </h2>
+            <div className="mb-4 p-3 rounded-lg bg-slate-50 border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg border border-slate-200 shrink-0" style={{ backgroundColor: actionPopup.suggestion.hexCode }} title={actionPopup.suggestion.hexCode} />
+                <div>
+                  <p className="text-xs text-slate-500 font-mono">{actionPopup.suggestion.hexCode}</p>
+                  {actionPopup.suggestion.user?.name && <p className="text-sm text-slate-600 mt-0.5">By {actionPopup.suggestion.user.name}</p>}
+                </div>
+              </div>
+            </div>
+            {actionPopup.action === 'approved' && (
+              <>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Color name *</label>
+                <input
+                  type="text"
+                  value={colorName}
+                  onChange={(e) => setColorName(e.target.value)}
+                  placeholder="e.g. Sunset Coral"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-300 mb-3"
+                  disabled={submitting}
+                />
+                <label className="block text-sm font-medium text-slate-700 mb-1">Color code *</label>
+                <input
+                  type="text"
+                  value={colorCode}
+                  onChange={(e) => setColorCode(e.target.value)}
+                  placeholder="e.g. BC-001 or hex"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-300 mb-3"
+                  disabled={submitting}
+                />
+              </>
+            )}
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              {actionPopup.action === 'approved' ? 'Optional note to include in notification' : 'Optional reason for rejection'}
+            </label>
+            <textarea
+              value={adminNotes}
+              onChange={(e) => setAdminNotes(e.target.value)}
+              placeholder={actionPopup.action === 'approved' ? 'e.g. Great choice! We’ll add it to the catalog soon.' : 'e.g. Color does not meet current range.'}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-300 resize-none"
+              disabled={submitting}
+            />
+            <div className="flex gap-2 mt-5 justify-end">
+              <button
+                type="button"
+                onClick={closePopup}
+                disabled={submitting}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={submitAction}
+                disabled={submitting || (actionPopup.action === 'approved' && (!colorName.trim() || !colorCode.trim()))}
+                className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50 ${actionPopup.action === 'approved' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}
+              >
+                {submitting ? 'Saving…' : actionPopup.action === 'approved' ? 'Approve' : 'Reject'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

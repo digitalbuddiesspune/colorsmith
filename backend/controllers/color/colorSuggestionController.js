@@ -1,17 +1,16 @@
 import ColorSuggestion from '../../models/ColorSuggestion.js';
-import { sendWhatsAppMessage } from '../../services/whatsappService.js';
+import { sendWhatsAppTemplate } from '../../services/whatsappService.js';
 
-// Create a color suggestion (protected — any logged-in user)
+// Create a color suggestion (protected — any logged-in user). Only hexCode from user; name/colorCode set by admin on approval.
 export const createSuggestion = async (req, res) => {
-  const { name, hexCode, product, notes, imageUrl } = req.body;
-  if (!name || !hexCode) {
-    return res.status(400).json({ success: false, message: 'Color name and hex code are required.' });
+  const { hexCode, product, notes, imageUrl } = req.body;
+  if (!hexCode || typeof hexCode !== 'string' || !hexCode.trim()) {
+    return res.status(400).json({ success: false, message: 'Hex code is required.' });
   }
   try {
     const suggestion = await ColorSuggestion.create({
       user: req.user._id,
-      name,
-      hexCode,
+      hexCode: hexCode.trim(),
       product: product || undefined,
       notes: notes || undefined,
       imageUrl: imageUrl || undefined,
@@ -47,17 +46,30 @@ export const getAllSuggestions = async (req, res) => {
   }
 };
 
-// Admin: Update suggestion status
+// Admin: Update suggestion status. For approval, admin must send name and colorCode (decided by admin).
 export const updateSuggestionStatus = async (req, res) => {
   const { id } = req.params;
-  const { status, adminNotes } = req.body;
+  const body = req.body ?? {};
+  const { status, adminNotes, name, colorCode } = body;
   if (!['pending', 'approved', 'rejected'].includes(status)) {
     return res.status(400).json({ success: false, message: 'Status must be pending, approved, or rejected.' });
   }
+  if (status === 'approved') {
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ success: false, message: 'Color name is required when approving.' });
+    }
+    if (!colorCode || typeof colorCode !== 'string' || !colorCode.trim()) {
+      return res.status(400).json({ success: false, message: 'Color code is required when approving.' });
+    }
+  }
+  const updateFields = { status, adminNotes: adminNotes || undefined };
+  if (status === 'approved' && name?.trim()) updateFields.name = name.trim();
+  if (status === 'approved' && colorCode?.trim()) updateFields.colorCode = colorCode.trim();
+
   try {
     const suggestion = await ColorSuggestion.findByIdAndUpdate(
       id,
-      { status, adminNotes: adminNotes || undefined },
+      updateFields,
       { new: true }
     )
       .populate('user', 'name phone');
@@ -68,12 +80,12 @@ export const updateSuggestionStatus = async (req, res) => {
     if (status === 'approved' && suggestion.user?.phone) {
       const userName = suggestion.user.name || 'Customer';
       const colorName = suggestion.name || 'your suggested color';
-      let body = `Hi ${userName}! Good news — your color suggestion "${colorName}" has been approved by Color Smith.`;
-      if (adminNotes && adminNotes.trim()) {
-        body += `\n\nNote from our team: ${adminNotes.trim()}`;
-      }
-      body += '\n\nThank you for your suggestion!';
-      sendWhatsAppMessage(suggestion.user.phone, body).catch((err) => {
+      const code = suggestion.colorCode || suggestion.hexCode || '—';
+      sendWhatsAppTemplate(suggestion.user.phone, {
+        '1': userName,
+        '2': colorName,
+        '3': code,
+      }).catch((err) => {
         console.error('WhatsApp approval notification failed:', err?.message || err);
       });
     }

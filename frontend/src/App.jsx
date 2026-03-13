@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { MessageProvider } from './context/MessageContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import CategoriesList from './pages/CategoriesList';
@@ -40,6 +41,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
+        <MessageProvider>
         <BrowserRouter>
           <Routes>
             {/* Public routes with Navbar and Footer */}
@@ -89,6 +91,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
+        </MessageProvider>
       </CartProvider>
     </AuthProvider>
   );

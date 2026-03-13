@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { users as usersApi } from '../../api/client';
+import { useMessage } from '../../context/MessageContext';
 
 const LIMIT = 20;
 
@@ -21,6 +22,7 @@ const formatDate = (d) =>
   });
 
 export default function AdminUsers() {
+  const { showMessage } = useMessage();
   const [userList, setUserList]     = useState([]);
   const [loading, setLoading]       = useState(true);
   const [page, setPage]             = useState(1);
@@ -62,7 +64,7 @@ export default function AdminUsers() {
       setUserList((prev) => prev.filter((u) => u._id !== id));
       setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
     } catch {
-      alert('Failed to delete user.');
+      showMessage('Failed to delete user.', 'error');
     } finally {
       setDeleting(null);
     }

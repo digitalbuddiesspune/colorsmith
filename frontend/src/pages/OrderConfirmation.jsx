@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation } from 'react-router-dom';
+import { useMessage } from '../context/MessageContext';
 import { orders as ordersApi } from '../api/client';
 import { formatOrderId } from '../utility/formatedOrderId';
 import { generateInvoicePDF } from '../utility/invoiceGenerator';
@@ -7,6 +8,7 @@ import { generateInvoicePDF } from '../utility/invoiceGenerator';
 export default function OrderConfirmation() {
   const { id } = useParams();
   const location = useLocation();
+  const { showMessage } = useMessage();
   const [order, setOrder] = useState(location.state?.order || null);
   const [loading, setLoading] = useState(!location.state?.order);
   const [error, setError] = useState('');
@@ -34,7 +36,7 @@ export default function OrderConfirmation() {
       await generateInvoicePDF(order);
     } catch (err) {
       console.error('Failed to generate invoice:', err);
-      alert('Failed to generate invoice. Please try again.');
+      showMessage('Failed to generate invoice. Please try again.', 'error');
     } finally {
       setGeneratingInvoice(false);
     }

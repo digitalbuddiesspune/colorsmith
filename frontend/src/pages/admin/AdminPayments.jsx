@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { orders as ordersApi } from '../../api/client';
 import { formatOrderId } from '../../utility/formatedOrderId';
+import { useMessage } from '../../context/MessageContext';
 
 const PAYMENT_COLORS = {
   paid:     'bg-emerald-100 text-emerald-700',
@@ -34,6 +35,7 @@ const formatAmount = (n) =>
   '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0 });
 
 export default function AdminPayments() {
+  const { showMessage } = useMessage();
   const [payments, setPayments]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [page, setPage]               = useState(1);
@@ -108,7 +110,7 @@ export default function AdminPayments() {
       XLSX.writeFile(wb, `payments_${new Date().toISOString().slice(0, 10)}.xlsx`);
     } catch (err) {
       console.error('Export failed:', err);
-      alert('Failed to export. Please try again.');
+      showMessage('Failed to export. Please try again.', 'error');
     } finally {
       setExportLoading(false);
     }
