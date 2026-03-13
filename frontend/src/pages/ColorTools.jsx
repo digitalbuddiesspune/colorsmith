@@ -63,7 +63,7 @@ export default function ColorTools() {
       {/* header */}
       <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-3">Color Tools</h1>
-        <p className="text-neutral-500 max-w-2xl">
+        <p className="text-neutral-500 max-w-2xl text-sm lg:text-base">
           Match colors from photos, suggest new shades, or preview how colors look on products — all powered by smart color analysis. In AI Color Match, you can allow camera access when prompted to capture a photo for color matching.
         </p>
       </div>
@@ -247,7 +247,7 @@ function AIColorMatch({ allColors, loading, onAddToSuggestion, onApplyOnLipsNail
             <svg className="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
           </div>
           <h3 className="text-lg font-semibold text-neutral-900 mb-2">Upload or capture a color</h3>
-          <p className="text-neutral-500 text-sm mb-4 max-w-md mx-auto">
+          <p className="text-neutral-500 text-xs lg:text-sm mb-4 max-w-md mx-auto">
             Take a photo or upload an image — we'll extract the dominant color and find the closest matches in our catalog.
           </p>
           <p className="text-neutral-500 text-xs mb-6 max-w-md mx-auto">
@@ -256,7 +256,7 @@ function AIColorMatch({ allColors, loading, onAddToSuggestion, onApplyOnLipsNail
           <div className="flex flex-wrap justify-center gap-3">
             <button onClick={openCamera} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-neutral-900 text-white font-semibold text-sm hover:bg-neutral-800 transition-all shadow-lg">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
-              Use camera (allow access when prompted)
+              Use camera 
             </button>
             <button onClick={() => fileRef.current?.click()} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-neutral-300 text-neutral-700 font-semibold text-sm hover:border-neutral-400 hover:bg-neutral-50 transition-all">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
@@ -638,266 +638,6 @@ function ColorSuggestion({ allProducts, suggestionPrefill, onPrefillConsumed }) 
   );
 }
 
-/* ───────── Lip contours: upper and lower (MediaPipe face mesh) ───────── */
-// const UPPER_OUTER_LIP = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291];
-// const LOWER_OUTER_LIP = [291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61];
-
-// const FINGERTIP_INDICES = [4, 8, 12, 16, 20];
-
-/* ═══════════════════════════════════════════
-   3. FACE & NAIL DETECT (MediaPipe)
-   ═══════════════════════════════════════════ */
-// function FaceNailDetect({ onAddToSuggestion, applyColorPrefill, onApplyColorPrefillConsumed }) {
-//   const videoRef = useRef(null);
-//   const canvasRef = useRef(null);
-//   const rafRef = useRef(null);
-//   const [stream, setStream] = useState(null);
-//   const [cameraOpen, setCameraOpen] = useState(false);
-//   const [cameraError, setCameraError] = useState(null);
-//   const [modelsReady, setModelsReady] = useState(false);
-//   const [modelsError, setModelsError] = useState(null);
-//   const [applyColor, setApplyColor] = useState('#e11d48');
-//   const faceLandmarkerRef = useRef(null);
-//   const handLandmarkerRef = useRef(null);
-
-//   useEffect(() => {
-//     if (applyColorPrefill) {
-//       setApplyColor(applyColorPrefill);
-//       onApplyColorPrefillConsumed?.();
-//     }
-//   }, [applyColorPrefill, onApplyColorPrefillConsumed]);
-
-//   const wasmPath = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm';
-//   const faceModelPath = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
-//   const handModelPath = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
-
-//   useEffect(() => {
-//     let cancelled = false;
-//     (async () => {
-//       try {
-//         const vision = await FilesetResolver.forVisionTasks(wasmPath);
-//         if (cancelled) return;
-//         const face = await FaceLandmarker.createFromOptions(vision, {
-//           baseOptions: { modelAssetPath: faceModelPath },
-//           runningMode: 'VIDEO',
-//           numFaces: 1,
-//         });
-//         if (cancelled) return;
-//         faceLandmarkerRef.current = face;
-//         const hand = await HandLandmarker.createFromOptions(vision, {
-//           baseOptions: { modelAssetPath: handModelPath },
-//           runningMode: 'VIDEO',
-//           numHands: 2,
-//         });
-//         if (cancelled) return;
-//         handLandmarkerRef.current = hand;
-//         setModelsReady(true);
-//       } catch (err) {
-//         if (!cancelled) setModelsError(err?.message || 'Failed to load detection models.');
-//       }
-//     })();
-//     return () => {
-//       cancelled = true;
-//       faceLandmarkerRef.current?.close?.();
-//       handLandmarkerRef.current?.close?.();
-//     };
-//   }, []);
-
-//   const drawLandmarks = useCallback((ctx, width, height, faceResult, handResult, colorHex) => {
-//     ctx.clearRect(0, 0, width, height);
-//     const scaleX = (x) => x * width;
-//     const scaleY = (y) => y * height;
-//     const hex = colorHex || '#e11d48';
-
-//     if (faceResult?.faceLandmarks?.length > 0) {
-//       const landmarks = faceResult.faceLandmarks[0];
-//       if (!landmarks.length) return;
-
-//       const pt = (i) => {
-//         const l = landmarks[i];
-//         return l ? [scaleX(l.x), scaleY(l.y)] : null;
-//       };
-
-//       const drawContour = (indices, fillWithColor = false) => {
-//         const points = indices.map((i) => pt(i)).filter(Boolean);
-//         if (points.length < 2) return;
-//         ctx.beginPath();
-//         ctx.moveTo(points[0][0], points[0][1]);
-//         for (let k = 1; k < points.length; k++) ctx.lineTo(points[k][0], points[k][1]);
-//         ctx.closePath();
-//         if (fillWithColor) {
-//           ctx.fillStyle = hex + 'cc';
-//           ctx.fill();
-//           ctx.strokeStyle = hex;
-//           ctx.lineWidth = 1;
-//           ctx.stroke();
-//         } else {
-//           ctx.stroke();
-//         }
-//       };
-
-//       drawContour(UPPER_OUTER_LIP.filter((i) => i < landmarks.length), true);
-//       drawContour(LOWER_OUTER_LIP.filter((i) => i < landmarks.length), true);
-//     }
-
-//     if (handResult?.landmarks?.length > 0) {
-//       ctx.fillStyle = hex + 'cc';
-//       handResult.landmarks.forEach((handLms) => {
-//         FINGERTIP_INDICES.forEach((idx) => {
-//           const l = handLms[idx];
-//           if (!l) return;
-//           const x = scaleX(l.x);
-//           const y = scaleY(l.y);
-//           ctx.beginPath();
-//           ctx.arc(x, y, Math.min(width, height) * 0.025, 0, Math.PI * 2);
-//           ctx.fill();
-//           ctx.strokeStyle = hex;
-//           ctx.lineWidth = 1;
-//           ctx.stroke();
-//         });
-//       });
-//     }
-//   }, []);
-
-//   const detectLoop = useCallback(() => {
-//     const video = videoRef.current;
-//     const canvas = canvasRef.current;
-//     if (!video || !canvas || !modelsReady || !video.videoWidth) {
-//       rafRef.current = requestAnimationFrame(detectLoop);
-//       return;
-//     }
-//     const faceLandmarker = faceLandmarkerRef.current;
-//     const handLandmarker = handLandmarkerRef.current;
-//     if (!faceLandmarker || !handLandmarker) {
-//       rafRef.current = requestAnimationFrame(detectLoop);
-//       return;
-//     }
-//     const w = video.videoWidth;
-//     const h = video.videoHeight;
-//     if (canvas.width !== w || canvas.height !== h) {
-//       canvas.width = w;
-//       canvas.height = h;
-//     }
-//     const timestamp = performance.now();
-//     let faceResult = null;
-//     let handResult = null;
-//     try {
-//       faceResult = faceLandmarker.detectForVideo(video, timestamp);
-//       handResult = handLandmarker.detectForVideo(video, timestamp);
-//     } catch (_) {}
-//     const ctx = canvas.getContext('2d');
-//     if (ctx) drawLandmarks(ctx, w, h, faceResult, handResult, applyColor);
-//     rafRef.current = requestAnimationFrame(detectLoop);
-//   }, [modelsReady, drawLandmarks, applyColor]);
-
-//   useEffect(() => {
-//     if (!cameraOpen || !modelsReady) return;
-//     rafRef.current = requestAnimationFrame(detectLoop);
-//     return () => cancelAnimationFrame(rafRef.current);
-//   }, [cameraOpen, modelsReady, detectLoop]);
-
-//   const openCamera = async () => {
-//     setCameraError(null);
-//     if (!navigator.mediaDevices?.getUserMedia) {
-//       setCameraError('Camera not supported. Use a modern browser with camera access.');
-//       return;
-//     }
-//     try {
-//       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } });
-//       setStream(s);
-//       setCameraOpen(true);
-//       setTimeout(() => {
-//         if (videoRef.current) videoRef.current.srcObject = s;
-//       }, 50);
-//     } catch (err) {
-//       const denied = err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError';
-//       setCameraError(denied ? 'Camera access denied. Allow camera in browser settings.' : 'Could not access camera.');
-//     }
-//   };
-
-//   const stopCamera = () => {
-//     stream?.getTracks().forEach((t) => t.stop());
-//     setStream(null);
-//     setCameraOpen(false);
-//     setCameraError(null);
-//   };
-
-//   if (!modelsReady && !modelsError) {
-//     return (
-//       <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-//         <p className="text-neutral-500">Loading face and hand detection models…</p>
-//       </div>
-//     );
-//   }
-
-//   if (modelsError) {
-//     return (
-//       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
-//         <p className="text-amber-800 mb-2">Models could not be loaded.</p>
-//         <p className="text-sm text-amber-700 mb-4">{modelsError}</p>
-//         <p className="text-xs text-neutral-500">Check your network and try again.</p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div>
-//       {!cameraOpen ? (
-//         <div className="border-2 border-dashed border-neutral-300 rounded-2xl p-10 text-center bg-neutral-50">
-//           <div className="w-16 h-16 rounded-full bg-neutral-200 flex items-center justify-center mx-auto mb-5">
-//             <svg className="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" /></svg>
-//           </div>
-//           <h3 className="text-lg font-semibold text-neutral-900 mb-2">Detect face, lips, eyes & nails</h3>
-//           <p className="text-neutral-500 text-sm mb-6 max-w-md mx-auto">
-//             Use your camera to see real-time detection of your face outline, lips, eyes, and fingernails (fingertips). Great for trying shades.
-//           </p>
-//           <button onClick={openCamera} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-neutral-900 text-white font-semibold text-sm hover:bg-neutral-800 transition-all shadow-lg">
-//             Start camera
-//           </button>
-//           {cameraError && <p className="mt-4 text-sm text-amber-600">{cameraError}</p>}
-//         </div>
-//       ) : (
-//         <div className="space-y-4">
-//           <div className="relative rounded-2xl overflow-hidden bg-black inline-block w-full max-w-2xl">
-//             <video ref={videoRef} autoPlay playsInline muted className="w-full max-h-[480px] object-cover" />
-//             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover pointer-events-none" style={{ maxHeight: '480px' }} />
-//             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-//               <button onClick={stopCamera} className="px-6 py-3 rounded-full bg-white text-neutral-900 font-semibold text-sm shadow-lg">Stop camera</button>
-//             </div>
-//             <div className="absolute top-2 left-2 text-white/90 text-xs">
-//               <span className="bg-white/20 px-2 py-0.5 rounded">Lips & nails (your color)</span>
-//             </div>
-//           </div>
-//           <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl border border-neutral-200 bg-white">
-//             <span className="text-sm font-medium text-neutral-700">Apply color on lips & nails:</span>
-//             <input
-//               type="color"
-//               value={applyColor}
-//               onChange={(e) => setApplyColor(e.target.value)}
-//               className="w-12 h-10 rounded-lg border border-neutral-300 cursor-pointer p-0.5"
-//             />
-//             <input
-//               type="text"
-//               value={applyColor}
-//               onChange={(e) => setApplyColor(e.target.value)}
-//               className="w-24 px-3 py-2 rounded-lg border border-neutral-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-neutral-900/20"
-//             />
-//             {onAddToSuggestion && (
-//               <button
-//                 type="button"
-//                 onClick={() => onAddToSuggestion(applyColor)}
-//                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 text-white text-sm font-semibold hover:bg-neutral-800 transition-all shadow"
-//               >
-//                 Add to color suggestion
-//                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-//               </button>
-//             )}
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
 
 const UPPER_OUTER_LIP = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291];
 const LOWER_OUTER_LIP = [291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61];
