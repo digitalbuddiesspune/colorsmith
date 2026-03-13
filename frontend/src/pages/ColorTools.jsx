@@ -250,7 +250,7 @@ function AIColorMatch({ allColors, loading, onAddToSuggestion, onApplyOnLipsNail
           <p className="text-neutral-500 text-xs lg:text-sm mb-4 max-w-md mx-auto">
             Take a photo or upload an image — we'll extract the dominant color and find the closest matches in our catalog.
           </p>
-          <p className="text-neutral-500 text-xs mb-6 max-w-md mx-auto">
+          <p className="text-neutral-500 text-xs lg:text-sm mb-6 max-w-md mx-auto">
             <strong className="text-neutral-700">Camera:</strong> When you tap Camera, your browser will ask for permission to use your camera. Allow access to capture a photo for color matching — we use it only for this feature.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -798,7 +798,8 @@ function FaceNailDetect({ onAddToSuggestion, applyColorPrefill, onApplyColorPref
     try {
       faceResult = faceLandmarker.detectForVideo(video, timestamp);
       handResult = handLandmarker.detectForVideo(video, timestamp);
-    } catch (_) {}
+    // eslint-disable-next-line no-unused-vars
+    } catch (_) { /* empty */ }
     const ctx = canvas.getContext('2d');
     if (ctx) drawLandmarks(ctx, w, h, faceResult, handResult, applyColor);
     rafRef.current = requestAnimationFrame(detectLoop);
