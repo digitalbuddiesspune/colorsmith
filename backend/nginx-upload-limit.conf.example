@@ -1,0 +1,17 @@
+# Add this inside the server or location block that proxies to your Node API
+# (e.g. for https://api.color-smith.com). This fixes 413 Request Entity Too Large
+# when uploading suggestion images; without it, nginx rejects the body before
+# it reaches Express (and the error response has no CORS headers).
+
+client_max_body_size 10M;
+
+# Example full location block:
+# location /api/ {
+#     client_max_body_size 10M;
+#     proxy_pass http://localhost:5001;
+#     proxy_http_version 1.1;
+#     proxy_set_header Host $host;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#     proxy_set_header X-Forwarded-Proto $scheme;
+# }

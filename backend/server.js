@@ -22,7 +22,20 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors());
+// Allow frontend origins (CORS). When nginx returns 413, its response has no CORS headers — fix 413 in nginx so requests reach this app.
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://www.color-smith.com',
+  'https://color-smith.com',
+];
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(null, false);
+  },
+  credentials: true,
+}));
 // Allow larger payloads (JSON/urlencoded). For multipart uploads, multer limits apply per route.
 // If you get 413 behind nginx, add: client_max_body_size 10M;
 app.use(express.json({ limit: '10mb' }));
