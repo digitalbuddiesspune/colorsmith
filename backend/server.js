@@ -23,7 +23,10 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 app.use(cors());
-app.use(express.json());
+// Allow larger payloads (JSON/urlencoded). For multipart uploads, multer limits apply per route.
+// If you get 413 behind nginx, add: client_max_body_size 10M;
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use('/api/v1', userRouter);
 app.use('/api/v1', categoryRoutes);
