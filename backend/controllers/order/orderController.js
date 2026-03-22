@@ -2,7 +2,8 @@ import Order from '../../models/Order.js';
 import Cart from '../../models/cart.js';
 import Product from '../../models/Product.js';
 import User from '../../models/User.js';
-import { sendWhatsAppMessage } from '../../services/whatsappService.js';
+import { formatOrderIdForDisplay } from '../../utils/formatOrderId.js';
+import { sendWhatsAppMessage, sendOrderConfirmationWhatsApp } from '../../services/whatsappService.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 
@@ -241,18 +242,47 @@ export const createOrder = async (req, res) => {
     // Clear user's cart after successful order
     await Cart.deleteMany({ user: userId });
 
-    // Send order confirmation WhatsApp: use profile WhatsApp number, else shipping phone
+    // Send order confirmation WhatsApp: registered profile phone first, else shipping phone
     const user = await User.findById(userId).select('name phone').lean();
     const toPhone = user?.phone || shippingAddress?.phone;
     if (toPhone) {
-      const orderNum = order.orderNumber || order._id.toString().slice(-8);
-      const totalStr = Number(order.grandTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 });
-      const itemCount = order.items?.length || 0;
-      const body = `Hi ${user?.name || 'there'}! Your order #${orderNum} has been confirmed. ${itemCount} item(s), Total: ₹${totalStr}. Thank you for shopping with Color Smith!`;
-      sendWhatsAppMessage(toPhone, body)
-        .then((r) => {
-          if (r.success) console.log('WhatsApp order confirmation sent to', toPhone);
-          else console.warn('WhatsApp order confirmation:', r.error);
+      // Same display as orders page / admin (formatOrderId)
+      const orderDisplayId = formatOrderIdForDisplay(order.orderNumber || order._id);
+      const amountDisplay = Number(order.grandTotal).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      const itemsCount =
+        order.items?.reduce((sum, line) => sum + (Number(line.quantity) || 0), 0) || order.items?.length || 0;
+      const userName = (user?.name || shippingAddress?.name || 'Customer').trim() || 'Customer';
+
+      const sendTemplate = () =>
+        sendOrderConfirmationWhatsApp(toPhone, {
+          userName,
+          orderId: orderDisplayId,
+          itemsCount,
+          amountDisplay,
+        });
+
+      const sendPlain = () => {
+        const body = `Hi ${userName}! Your order ${orderDisplayId} has been confirmed. ${itemsCount} item(s), Total: ₹${amountDisplay}. Thank you for shopping with Color Smith!`;
+        return sendWhatsAppMessage(toPhone, body);
+      };
+
+      (process.env.TWILIO_ORDER_CONFIRMATION_TEMPLATE_ID ? sendTemplate() : sendPlain())
+        .then(async (r) => {
+          if (r.success) {
+            console.log('WhatsApp order confirmation sent to', toPhone);
+            return;
+          }
+          // Template failed (e.g. misconfigured): try plain message once if we tried template
+          if (process.env.TWILIO_ORDER_CONFIRMATION_TEMPLATE_ID) {
+            const fallback = await sendPlain();
+            if (fallback.success) console.log('WhatsApp order confirmation (fallback text) sent to', toPhone);
+            else console.warn('WhatsApp order confirmation:', r.error, fallback.error);
+          } else {
+            console.warn('WhatsApp order confirmation:', r.error);
+          }
         })
         .catch((err) => {
           console.error('WhatsApp order confirmation failed:', err?.message || err);

@@ -5,7 +5,9 @@ import twilio from 'twilio';
  * - TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN: Twilio credentials
  * - TWILIO_WHATSAPP_FROM: WhatsApp sender (e.g. whatsapp:+919289789721)
  * - TWILIO_WHATSAPP_FROM_NAME: Display name for the sender (e.g. ColorSmith)
- * - TWILIO_TEMPLATE_ID: Optional Content SID for approved WhatsApp templates (e.g. HX32b5...)
+ * - TWILIO_TEMPLATE_ID: Content SID for other flows (e.g. color approval)
+ * - TWILIO_ORDER_CONFIRMATION_TEMPLATE_ID: Content SID for order confirmation template
+ *   Placeholders: {{1}} name, {{2}} order id, {{3}} items count, {{4}} amount (no ₹ — template shows ₹{{4}})
  *
  * TWILIO_WHATSAPP_FROM must be a WhatsApp-enabled sender:
  * - Testing: Sandbox number from Twilio Console → Messaging → Try it out
@@ -107,6 +109,54 @@ export async function sendWhatsAppTemplate(toPhone, contentVariables) {
     return { success: true };
   } catch (err) {
     console.error('WhatsApp template send error:', err?.message || err);
+    return { success: false, error: err?.message || 'Send failed' };
+  }
+}
+
+/**
+ * Order confirmation using TWILIO_ORDER_CONFIRMATION_TEMPLATE_ID.
+ * Template example: Hi {{1}}, your order {{2}} has been confirmed. Items: {{3}}, Amount: ₹{{4}}
+ *
+ * @param {string} toPhone - User WhatsApp / phone (E.164 or local with country code)
+ * @param {{ userName: string, orderId: string, itemsCount: string|number, amountDisplay: string }} vars
+ */
+export async function sendOrderConfirmationWhatsApp(toPhone, vars) {
+  const twilioConfig = getTwilioClient();
+  const contentSid = process.env.TWILIO_ORDER_CONFIRMATION_TEMPLATE_ID;
+
+  if (!twilioConfig) {
+    console.warn('WhatsApp: Missing Twilio credentials. Skip order confirmation template.');
+    return { success: false, error: 'WhatsApp not configured' };
+  }
+  if (!contentSid) {
+    return { success: false, error: 'TWILIO_ORDER_CONFIRMATION_TEMPLATE_ID not set' };
+  }
+
+  const to = normalizePhone(toPhone);
+  if (!to) {
+    return { success: false, error: 'Invalid phone number' };
+  }
+
+  const toWhatsApp = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`;
+  const fromWhatsApp = twilioConfig.fromNumber.startsWith('whatsapp:') ? twilioConfig.fromNumber : `whatsapp:${twilioConfig.fromNumber}`;
+
+  const contentVariables = {
+    1: String(vars.userName || 'Customer'),
+    2: String(vars.orderId || ''),
+    3: String(vars.itemsCount ?? ''),
+    4: String(vars.amountDisplay ?? ''),
+  };
+
+  try {
+    await twilioConfig.client.messages.create({
+      from: fromWhatsApp,
+      to: toWhatsApp,
+      contentSid,
+      contentVariables: JSON.stringify(contentVariables),
+    });
+    return { success: true };
+  } catch (err) {
+    console.error('WhatsApp order confirmation template error:', err?.message || err);
     return { success: false, error: err?.message || 'Send failed' };
   }
 }
