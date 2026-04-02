@@ -53,12 +53,12 @@ export function CartProvider({ children }) {
 
   // Fetch cart from backend or load from storage
   const fetchCart = useCallback(async () => {
+    setLoading(true);
     if (isLoggedIn()) {
       try {
         const res = await cartApi.list();
         const items = (res.data?.data ?? []).map(normalizeItem);
         setCart(items);
-        clearCartStorage(); // Clear local storage since we have backend data
       } catch {
         // Fallback to localStorage if API fails
         setCart(loadCartFromStorage());
@@ -69,18 +69,50 @@ export function CartProvider({ children }) {
     setLoading(false);
   }, []);
 
+  // Merge local guest cart into backend once user is logged in
+  const mergeLocalCartToBackend = useCallback(async () => {
+    const localCart = loadCartFromStorage();
+    if (localCart.length === 0 || !isLoggedIn()) return;
+
+    for (const item of localCart) {
+      try {
+        await cartApi.add({
+          product: item.productId,
+          productName: item.productName ?? '',
+          productImage: item.productImage ?? null,
+          grade: item.grade ?? null,
+          colors: item.colors ?? [],
+          quantity: item.quantity ?? 1,
+          unitPrice: item.unitPrice ?? 0,
+          totalPrice: item.totalPrice ?? 0,
+        });
+      } catch {}
+    }
+    clearCartStorage();
+  }, []);
+
   // Initial load
   useEffect(() => {
     if (!initialFetchDone.current) {
       initialFetchDone.current = true;
-      fetchCart();
+      (async () => {
+        if (isLoggedIn()) {
+          await mergeLocalCartToBackend();
+        }
+        await fetchCart();
+      })();
     }
-  }, [fetchCart]);
+  }, [fetchCart, mergeLocalCartToBackend]);
 
   // Listen for login/logout events to refresh cart
   useEffect(() => {
     const onAuthChange = () => {
-      fetchCart();
+      (async () => {
+        if (isLoggedIn()) {
+          await mergeLocalCartToBackend();
+        }
+        await fetchCart();
+      })();
     };
     window.addEventListener('auth-logout', onAuthChange);
     window.addEventListener('auth-login', onAuthChange);
@@ -88,7 +120,7 @@ export function CartProvider({ children }) {
       window.removeEventListener('auth-logout', onAuthChange);
       window.removeEventListener('auth-login', onAuthChange);
     };
-  }, [fetchCart]);
+  }, [fetchCart, mergeLocalCartToBackend]);
 
   // Save to localStorage only when not logged in
   useEffect(() => {
@@ -216,29 +248,6 @@ export function CartProvider({ children }) {
     setCart([]);
     clearCartStorage();
   }, []);
-
-  // Merge localStorage cart into backend when user logs in
-  const mergeLocalCartToBackend = useCallback(async () => {
-    const localCart = loadCartFromStorage();
-    if (localCart.length === 0 || !isLoggedIn()) return;
-
-    for (const item of localCart) {
-      try {
-        await cartApi.add({
-          product: item.productId,
-          productName: item.productName ?? '',
-          productImage: item.productImage ?? null,
-          grade: item.grade ?? null,
-          colors: item.colors ?? [],
-          quantity: item.quantity ?? 1,
-          unitPrice: item.unitPrice ?? 0,
-          totalPrice: item.totalPrice ?? 0,
-        });
-      } catch {}
-    }
-    clearCartStorage();
-    fetchCart();
-  }, [fetchCart]);
 
   // Number of distinct items (lines) in cart, not sum of quantities
   const itemCount = cart.length;

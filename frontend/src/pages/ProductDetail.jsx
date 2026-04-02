@@ -428,7 +428,11 @@ export default function ProductDetail() {
                 {addingToCart ? 'Adding…' : addedToCart ? '✓ Added to cart' : 'Add to cart'}
               </button>
               {addedToCart && (
-                <Link to="/cart" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
+                <Link
+                  to="/cart"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+                >
                   View cart →
                 </Link>
               )}

@@ -42,6 +42,15 @@ export default function OrderConfirmation() {
     }
   };
 
+  const formatDateTime = (date) =>
+    new Date(date).toLocaleString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center text-slate-600">
@@ -136,6 +145,76 @@ export default function OrderConfirmation() {
               )}
               {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
             </span>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 mb-6 border-t border-slate-200 pt-4">
+          <div>
+            <p className="text-sm text-slate-600 mb-1">Items</p>
+            <p className="text-slate-900 font-medium">
+              {order.items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) || order.items?.length || 0}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-600 mb-1">Order Date & Time</p>
+            <p className="text-slate-900 font-medium">{formatDateTime(order.createdAt)}</p>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-200 pt-4 mb-6">
+          <h3 className="font-medium text-slate-900 mb-3">Delivery Address</h3>
+          <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 space-y-1">
+            <p className="font-medium text-slate-900">{order.shippingAddress?.name || 'N/A'}</p>
+            <p>{order.shippingAddress?.address || 'N/A'}</p>
+            <p>
+              {(order.shippingAddress?.city || 'N/A')}
+              {order.shippingAddress?.state ? `, ${order.shippingAddress.state}` : ''}
+              {order.shippingAddress?.zip ? ` - ${order.shippingAddress.zip}` : ''}
+            </p>
+            <p>{order.shippingAddress?.country || 'India'}</p>
+            <p>Phone: {order.shippingAddress?.phone || 'N/A'}</p>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-200 pt-4">
+          <h3 className="font-medium text-slate-900 mb-3">Products</h3>
+          <div className="space-y-3 mb-6">
+            {order.items?.map((item, index) => {
+              const qty = Number(item.quantity) || 0;
+              const unitPrice = Number(item.unitPrice) || 0;
+              const lineTotal = Number(item.totalPrice) || unitPrice * qty;
+              return (
+                <div key={`${item.product || index}-${index}`} className="rounded-lg border border-slate-200 p-3">
+                  <div className="flex items-start gap-3">
+                    {item.productImage ? (
+                      <img
+                        src={item.productImage}
+                        alt={item.productName || 'Product'}
+                        className="w-14 h-14 rounded-lg object-cover bg-slate-100"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-slate-900">{item.productName || 'Product'}</p>
+                      <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-slate-600">
+                        <p>Qty: {qty}</p>
+                        <p>
+                          Unit: Rs{unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                        <p className="sm:text-right">
+                          Total: Rs{lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
